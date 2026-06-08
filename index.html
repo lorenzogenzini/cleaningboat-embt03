@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CleaningBoat EMBT03 | AI Vision System</title>
+    <meta property="og:title" content="CleaningBoat EMBT03">
+    <meta property="og:description" content="Sistema di computer vision per riconoscimento rifiuti plastici in ambiente acquatico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0f; --bg2: #12121a; --bg3: #1a1a2e; --text: #e8e8f0; --text2: #a0a0b8;
+            --accent: #00d4ff; --accent2: #0099cc; --accent-glow: rgba(0,212,255,0.3);
+            --green: #00ff88; --green-glow: rgba(0,255,136,0.3); --red: #ff4466; --amber: #ffaa00; --purple: #b44dff;
+            --border: rgba(255,255,255,0.06); --border2: rgba(255,255,255,0.12);
+            --ff-display: 'Space Grotesk', sans-serif; --ff-body: 'Inter', sans-serif; --ff-mono: 'JetBrains Mono', monospace;
+            --radius: 16px; --radius-sm: 10px; --transition: 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior:smooth; background:var(--bg); }
+        body { font-family:var(--ff-body); background:var(--bg); color:var(--text); min-height:100vh; line-height:1.6; overflow-x:hidden; }
+        .bg-grid { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; background-image:linear-gradient(rgba(0,212,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.03) 1px,transparent 1px); background-size:60px 60px; animation:gridMove 20s linear infinite; }
+        @keyframes gridMove { 0%{transform:translate(0,0)} 100%{transform:translate(60px,60px)} }
+        .bg-orb { position:fixed; border-radius:50%; filter:blur(120px); pointer-events:none; z-index:0; opacity:0.12; animation:orbFloat 15s ease-in-out infinite; }
+        .bg-orb-1 { width:600px; height:600px; background:var(--accent); top:-200px; right:-150px; }
+        .bg-orb-2 { width:500px; height:500px; background:var(--purple); bottom:-200px; left:-150px; animation-delay:-7s; }
+        @keyframes orbFloat { 0%,100%{transform:translate(0,0) scale(1)} 25%{transform:translate(100px,-80px) scale(1.2)} 50%{transform:translate(-60px,100px) scale(0.9)} 75%{transform:translate(-120px,-60px) scale(1.1)} }
+        .page { display:none; min-height:100vh; position:relative; z-index:1; opacity:0; transform:translateY(20px); transition:opacity 0.5s ease, transform 0.5s ease; padding-bottom:80px; }
+        .page.active { display:block; opacity:1; transform:translateY(0); }
+        #page-home.active { display:flex; flex-direction:column; }
+        .main-header { position:sticky; top:0; z-index:1000; padding:1rem 2.5rem; display:flex; justify-content:space-between; align-items:center; background:rgba(10,10,15,0.85); backdrop-filter:blur(25px); border-bottom:1px solid var(--border); flex-wrap:wrap; gap:0.75rem; }
+        .logo { font-family:var(--ff-display); font-weight:700; font-size:1rem; color:var(--text); display:flex; align-items:center; gap:0.5rem; cursor:pointer; }
+        .logo-icon { width:34px; height:34px; background:linear-gradient(135deg,var(--accent),var(--purple)); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; box-shadow:0 0 20px var(--accent-glow); animation:logoPulse 2.5s ease-in-out infinite; }
+        @keyframes logoPulse { 0%,100%{box-shadow:0 0 20px var(--accent-glow)} 50%{box-shadow:0 0 45px var(--accent-glow),0 0 70px rgba(180,77,255,0.25)} }
+        .logo span { background:linear-gradient(135deg,var(--accent),var(--purple)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .main-nav { display:flex; gap:0.2rem; flex-wrap:wrap; }
+        .nav-link { padding:0.45rem 0.8rem; font-size:0.72rem; font-weight:500; color:var(--text2); border:1px solid transparent; background:none; cursor:pointer; border-radius:6px; transition:all var(--transition); }
+        .nav-link:hover { color:#fff; border-color:rgba(255,255,255,0.2); background:rgba(255,255,255,0.03); }
+        .nav-link.highlight { border-color:rgba(0,212,255,0.4); color:var(--accent); font-weight:600; }
+        .nav-link.chat-highlight { border-color:rgba(180,77,255,0.5); color:var(--purple); font-weight:600; animation:chatGlow 2s ease-in-out infinite; }
+        @keyframes chatGlow { 0%,100%{box-shadow:0 0 5px rgba(180,77,255,0.2)} 50%{box-shadow:0 0 20px rgba(180,77,255,0.5)} }
+        .chat-widget { position:fixed; bottom:1.5rem; right:1.5rem; z-index:9999; font-family:var(--ff-body); }
+        .chat-toggle { width:55px; height:55px; border-radius:50%; background:linear-gradient(135deg,var(--purple),var(--accent)); border:none; cursor:pointer; font-size:1.5rem; color:#fff; box-shadow:0 0 30px rgba(180,77,255,0.4); transition:all var(--transition); display:flex; align-items:center; justify-content:center; }
+        .chat-toggle:hover { transform:scale(1.1); box-shadow:0 0 50px rgba(180,77,255,0.6); }
+        .chat-toggle.active { background:var(--red); }
+        .chat-panel { display:none; position:absolute; bottom:70px; right:0; width:400px; max-height:600px; background:rgba(18,18,26,0.98); backdrop-filter:blur(25px); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; flex-direction:column; box-shadow:0 20px 60px rgba(0,0,0,0.8); }
+        .chat-panel.open { display:flex; }
+        .chat-header { padding:1rem 1.2rem; background:rgba(0,0,0,0.3); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:0.5rem; }
+        .chat-header-icon { font-size:1.2rem; }
+        .chat-header-title { font-family:var(--ff-display); font-size:0.9rem; font-weight:700; flex:1; }
+        .chat-header-subtitle { font-size:0.65rem; color:var(--text2); }
+        .chat-close { background:none; border:none; color:var(--text2); cursor:pointer; font-size:1.1rem; padding:0.2rem 0.5rem; border-radius:4px; transition:all var(--transition); }
+        .chat-close:hover { color:var(--red); background:rgba(255,68,102,0.1); }
+        .chat-messages { flex:1; overflow-y:auto; padding:1rem; display:flex; flex-direction:column; gap:0.75rem; max-height:400px; }
+        .chat-message { display:flex; gap:0.5rem; animation:msgIn 0.3s ease; }
+        @keyframes msgIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+        .chat-message.user { flex-direction:row-reverse; }
+        .chat-avatar { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.8rem; flex-shrink:0; }
+        .chat-message.bot .chat-avatar { background:rgba(180,77,255,0.2); }
+        .chat-message.user .chat-avatar { background:rgba(0,212,255,0.2); }
+        .chat-bubble { padding:0.7rem 1rem; border-radius:12px; font-size:0.82rem; line-height:1.5; max-width:300px; word-wrap:break-word; }
+        .chat-message.bot .chat-bubble { background:rgba(255,255,255,0.05); border:1px solid var(--border); border-bottom-left-radius:4px; color:var(--text); }
+        .chat-message.user .chat-bubble { background:rgba(0,212,255,0.1); border:1px solid rgba(0,212,255,0.2); border-bottom-right-radius:4px; color:var(--text); }
+        .chat-typing { display:none; padding:0.5rem 1rem; }
+        .chat-typing.active { display:flex; align-items:center; gap:0.3rem; }
+        .chat-typing-dot { width:7px; height:7px; border-radius:50%; background:var(--purple); animation:typingBounce 1.4s ease-in-out infinite; }
+        .chat-typing-dot:nth-child(2){animation-delay:0.2s} .chat-typing-dot:nth-child(3){animation-delay:0.4s}
+        @keyframes typingBounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-8px)} }
+        .chat-input-area { padding:0.75rem 1rem; border-top:1px solid var(--border); display:flex; gap:0.5rem; }
+        .chat-input { flex:1; padding:0.65rem 1rem; background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:8px; color:var(--text); font-family:var(--ff-body); font-size:0.8rem; outline:none; transition:all var(--transition); }
+        .chat-input:focus { border-color:var(--purple); box-shadow:0 0 15px rgba(180,77,255,0.15); }
+        .chat-send { padding:0.65rem 1rem; background:linear-gradient(135deg,var(--purple),var(--accent)); color:#fff; border:none; border-radius:8px; cursor:pointer; font-weight:600; font-size:0.8rem; transition:all var(--transition); }
+        .chat-send:hover { box-shadow:0 0 20px rgba(180,77,255,0.4); }
+        .chat-suggestions { display:flex; gap:0.4rem; flex-wrap:wrap; padding:0.5rem 1rem 0.75rem; }
+        .chat-suggestion { padding:0.35rem 0.75rem; background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:20px; font-size:0.7rem; color:var(--text2); cursor:pointer; transition:all var(--transition); white-space:nowrap; }
+        .chat-suggestion:hover { border-color:var(--purple); color:var(--purple); background:rgba(180,77,255,0.05); }
+        .hero-section { display:grid; grid-template-columns:1fr 1fr; min-height:80vh; }
+        .hero-left { padding:4rem 3rem; display:flex; flex-direction:column; justify-content:center; }
+        .hero-badge { display:inline-flex; align-items:center; gap:0.4rem; padding:0.4rem 1rem; background:rgba(0,212,255,0.08); border:1px solid rgba(0,212,255,0.2); border-radius:50px; font-family:var(--ff-mono); font-size:0.65rem; color:var(--accent); margin-bottom:1.5rem; width:fit-content; animation:fadeInUp 0.8s ease; }
+        .hero-badge-dot { width:7px; height:7px; border-radius:50%; background:var(--accent); animation:dotPulse 1.5s ease-in-out infinite; }
+        @keyframes dotPulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+        @keyframes fadeInUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+        .hero-title { font-family:var(--ff-display); font-size:clamp(3rem,5vw,5.5rem); line-height:0.92; font-weight:800; margin-bottom:1.2rem; animation:fadeInUp 0.8s ease 0.1s both; }
+        .hero-title em { font-style:normal; background:linear-gradient(135deg,var(--accent),var(--purple)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; display:block; font-size:0.45em; font-weight:600; margin-top:0.15rem; }
+        .hero-desc { font-size:0.95rem; color:var(--text2); max-width:420px; margin-bottom:2rem; animation:fadeInUp 0.8s ease 0.2s both; }
+        .hero-cta { display:flex; gap:0.75rem; flex-wrap:wrap; animation:fadeInUp 0.8s ease 0.3s both; }
+        .btn-primary { padding:12px 26px; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#000; font-weight:600; border:none; cursor:pointer; border-radius:10px; transition:all var(--transition); }
+        .btn-primary:hover { transform:translateY(-2px); box-shadow:0 0 40px rgba(0,212,255,0.3); }
+        .btn-secondary { padding:12px 26px; background:transparent; color:var(--text); font-weight:500; border:1px solid var(--border2); border-radius:10px; cursor:pointer; transition:all var(--transition); margin-left:0.5rem; }
+        .btn-secondary:hover { border-color:var(--accent); background:rgba(0,212,255,0.05); }
+        .hero-stats { display:flex; margin-top:3rem; border-top:1px solid var(--border); padding-top:1.5rem; animation:fadeInUp 0.8s ease 0.4s both; }
+        .hero-stat { flex:1; text-align:center; }
+        .hero-stat:not(:last-child){border-right:1px solid var(--border)}
+        .hero-stat-v { font-family:var(--ff-display); font-size:1.8rem; font-weight:700; background:linear-gradient(135deg,var(--accent),var(--purple)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .hero-stat-l { font-size:0.65rem; color:var(--text2); margin-top:0.2rem; font-weight:500; text-transform:uppercase; }
+        .hero-right { background:rgba(18,18,26,0.5); backdrop-filter:blur(20px); display:flex; flex-direction:column; border-left:1px solid var(--border); }
+        .hero-menu-card { padding:1.5rem 2rem; border-bottom:1px solid var(--border); cursor:pointer; transition:all var(--transition); flex:1; display:flex; flex-direction:column; justify-content:center; }
+        .hero-menu-card:hover { background:rgba(0,212,255,0.05); padding-left:2.5rem; }
+        .hero-menu-num { font-family:var(--ff-mono); font-size:0.6rem; color:var(--accent); margin-bottom:0.3rem; }
+        .hero-menu-title { font-family:var(--ff-display); font-size:1.3rem; font-weight:700; }
+        .hero-menu-sub { font-size:0.75rem; color:var(--text2); }
+        .hero-menu-grid { display:grid; grid-template-columns:repeat(4,1fr); flex:1; }
+        .hero-mini-card { padding:1.2rem; border-right:1px solid var(--border); cursor:pointer; transition:all var(--transition); display:flex; flex-direction:column; justify-content:center; }
+        .hero-mini-card:last-child{border-right:none}
+        .hero-mini-card:hover { background:rgba(180,77,255,0.08); }
+        .hero-mini-num { font-family:var(--ff-mono); font-size:0.55rem; color:var(--accent); margin-bottom:0.25rem; }
+        .hero-mini-title { font-family:var(--ff-display); font-size:0.8rem; font-weight:600; }
+        .home-section { padding:4rem 3rem; border-top:1px solid var(--border); z-index:1; }
+        .home-section-dark { background:rgba(18,18,26,0.4); backdrop-filter:blur(10px); }
+        .home-section-header { text-align:center; margin-bottom:2.5rem; }
+        .home-section-eyebrow { font-family:var(--ff-mono); font-size:0.65rem; color:var(--accent); text-transform:uppercase; letter-spacing:2px; margin-bottom:0.5rem; }
+        .home-section-title { font-family:var(--ff-display); font-size:2rem; font-weight:800; background:linear-gradient(135deg,#fff 0%,#c0c0d0 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:0.5rem; }
+        .home-section-sub { font-size:0.85rem; color:var(--text2); max-width:500px; margin:0 auto; }
+        .quick-links-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1rem; max-width:1000px; margin:0 auto; }
+        .quick-link-card { background:rgba(18,18,26,0.6); border:1px solid var(--border); padding:1.5rem; border-radius:var(--radius); cursor:pointer; transition:all var(--transition); display:flex; flex-direction:column; gap:0.5rem; }
+        .quick-link-card:hover { border-color:rgba(0,212,255,0.3); transform:translateY(-4px); box-shadow:0 15px 40px rgba(0,0,0,0.4); }
+        .quick-link-icon { font-size:1.8rem; }
+        .quick-link-label { font-family:var(--ff-mono); font-size:0.58rem; color:var(--accent); text-transform:uppercase; }
+        .quick-link-title { font-family:var(--ff-display); font-size:1.1rem; font-weight:700; }
+        .quick-link-desc { font-size:0.78rem; color:var(--text2); }
+        .features-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:1.5rem; max-width:1000px; margin:0 auto; }
+        .feature-card { background:rgba(18,18,26,0.5); border:1px solid var(--border); padding:2rem; border-radius:var(--radius); text-align:center; transition:all var(--transition); backdrop-filter:blur(10px); }
+        .feature-card:hover { border-color:rgba(0,255,136,0.3); transform:translateY(-3px); }
+        .feature-icon { font-size:2.5rem; margin-bottom:1rem; }
+        .feature-title { font-family:var(--ff-display); font-size:1.1rem; font-weight:700; }
+        .feature-desc { font-size:0.82rem; color:var(--text2); }
+        .team-preview { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; max-width:800px; margin:0 auto 2rem; }
+        .team-avatar { width:55px; height:55px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--purple)); display:flex; align-items:center; justify-content:center; font-family:var(--ff-display); font-weight:700; font-size:1rem; cursor:pointer; transition:all var(--transition); border:2px solid transparent; position:relative; }
+        .team-avatar:hover { transform:scale(1.2); border-color:var(--accent); box-shadow:0 0 25px var(--accent-glow); z-index:10; }
+        .team-avatar-tooltip { position:absolute; bottom:-30px; background:var(--bg3); padding:3px 8px; border-radius:5px; font-size:0.6rem; white-space:nowrap; opacity:0; pointer-events:none; transition:opacity 0.2s; border:1px solid var(--border); }
+        .team-avatar:hover .team-avatar-tooltip { opacity:1; }
+        .inner-nav { position:sticky; top:0; z-index:200; background:rgba(10,10,15,0.9); backdrop-filter:blur(20px); display:flex; align-items:stretch; border-bottom:1px solid var(--accent); }
+        .inner-nav-back { padding:0 1.2rem; font-size:0.75rem; font-weight:600; color:var(--accent); border:none; background:none; cursor:pointer; border-right:1px solid var(--border); display:flex; align-items:center; gap:0.4rem; }
+        .inner-nav-title { padding:0 1.2rem; font-family:var(--ff-display); font-size:0.8rem; font-weight:600; display:flex; align-items:center; gap:0.5rem; }
+        .inner-nav-tag { font-family:var(--ff-mono); font-size:0.58rem; color:var(--accent); padding:2px 7px; border:1px solid rgba(0,212,255,0.3); border-radius:4px; }
+        .inner-nav-links { display:flex; margin-left:auto; }
+        .inner-nav-link { padding:0 1rem; font-size:0.7rem; color:var(--text2); border:none; background:none; cursor:pointer; border-left:1px solid var(--border); }
+        .inner-nav-link:hover,.inner-nav-link.active { color:var(--accent); background:rgba(0,212,255,0.05); }
+        .ph { background:rgba(18,18,26,0.6); backdrop-filter:blur(10px); padding:3rem 3rem 2.5rem; border-bottom:1px solid var(--border); position:relative; overflow:hidden; }
+        .ph-band { position:absolute; top:0; left:0; width:3px; height:100%; background:linear-gradient(180deg,var(--accent),var(--purple)); }
+        .ph-tag { font-family:var(--ff-mono); font-size:0.62rem; color:var(--accent); text-transform:uppercase; letter-spacing:1px; margin-bottom:0.75rem; }
+        .ph-title { font-family:var(--ff-display); font-size:2.5rem; font-weight:800; background:linear-gradient(135deg,#fff 0%,#c0c0d0 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:0.5rem; }
+        .ph-sub { font-size:0.85rem; color:var(--text2); max-width:500px; }
+        .pc { padding:2.5rem 3rem; max-width:1000px; z-index:1; }
+        .slabel { font-family:var(--ff-display); font-size:0.8rem; font-weight:700; color:#fff; margin:2.5rem 0 1.2rem; display:flex; align-items:center; gap:0.75rem; }
+        .slabel::before { content:''; width:24px; height:2px; background:linear-gradient(90deg,var(--accent),var(--purple)); border-radius:1px; }
+        .slabel::after { content:''; flex:1; height:1px; background:var(--border); }
+        .card { background:rgba(18,18,26,0.7); border:1px solid var(--border); padding:1.5rem; border-radius:var(--radius); backdrop-filter:blur(10px); }
+        .card-teal { border-left:3px solid var(--accent); }
+        .card-orange { border-left:3px solid var(--purple); }
+        .g2 { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:1rem; }
+        .g3 { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:0.85rem; }
+        .g4 { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:0.85rem; }
+        .stat-row { display:flex; gap:0; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; flex-wrap:wrap; background:rgba(18,18,26,0.5); }
+        .stat-box { flex:1; padding:1.2rem; text-align:center; border-right:1px solid var(--border); }
+        .stat-box:last-child{border-right:none}
+        .stat-v { font-family:var(--ff-display); font-size:1.6rem; font-weight:700; background:linear-gradient(135deg,var(--accent),var(--purple)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .stat-l { font-size:0.62rem; color:var(--text2); margin-top:0.2rem; font-weight:500; text-transform:uppercase; letter-spacing:1px; }
+        .alert { display:flex; gap:0.6rem; padding:0.85rem 1rem; font-size:0.8rem; border-radius:var(--radius-sm); border:1px solid; }
+        .alert-warn { background:rgba(255,170,0,0.08); border-color:rgba(255,170,0,0.3); color:var(--amber); }
+        .alert-info { background:rgba(0,212,255,0.06); border-color:rgba(0,212,255,0.2); color:var(--accent); }
+        .team-card { background:rgba(18,18,26,0.7); border:1px solid var(--border); padding:1.3rem; border-radius:var(--radius); transition:all var(--transition); }
+        .team-card:hover { border-color:rgba(0,212,255,0.3); transform:translateY(-3px); }
+        .team-abbr { font-family:var(--ff-mono); font-size:0.62rem; font-weight:700; padding:3px 8px; border-radius:5px; display:inline-block; margin-bottom:0.5rem; }
+        .team-name { font-family:var(--ff-display); font-size:0.9rem; font-weight:600; }
+        .team-role { font-size:0.72rem; color:var(--text2); }
+        .tool-card { background:rgba(18,18,26,0.7); border:1px solid var(--border); padding:1.1rem; border-radius:var(--radius); display:flex; gap:0.85rem; align-items:flex-start; }
+        .tool-card:hover { border-color:rgba(0,255,136,0.3); }
+        .tool-icon { font-size:1.2rem; }
+        .tool-cat { font-family:var(--ff-mono); font-size:0.55rem; font-weight:700; text-transform:uppercase; padding:2px 7px; border-radius:4px; margin-bottom:0.25rem; display:inline-block; }
+        .tool-name { font-family:var(--ff-display); font-size:0.88rem; font-weight:700; }
+        .tool-desc { font-size:0.72rem; color:var(--text2); }
+        .gantt-wrap { overflow-x:auto; border:1px solid var(--border); border-radius:var(--radius); background:rgba(18,18,26,0.5); }
+        .gantt-table { width:100%; border-collapse:collapse; min-width:550px; }
+        .gantt-table thead th { padding:10px 14px; font-family:var(--ff-mono); font-size:0.6rem; font-weight:600; text-transform:uppercase; color:var(--accent); background:rgba(0,0,0,0.3); }
+        .gantt-table td { padding:8px 14px; border-bottom:1px solid var(--border); font-size:0.76rem; }
+        .gantt-bar { height:12px; border-radius:15px; display:block; margin:0 auto; box-shadow:0 0 8px currentColor; animation:gbar 0.8s ease-out both; }
+        @keyframes gbar { from{transform:scaleX(0);transform-origin:left} to{transform:scaleX(1)} }
+        .ms-list { display:flex; flex-direction:column; }
+        .ms-item { display:grid; grid-template-columns:90px 1fr auto; gap:1rem; align-items:flex-start; padding:1rem 0; border-bottom:1px solid var(--border); }
+        .ms-item:last-child{border-bottom:none}
+        .ms-date { font-family:var(--ff-mono); font-size:0.65rem; color:var(--accent); }
+        .ms-title { font-family:var(--ff-display); font-size:0.9rem; font-weight:600; }
+        .ms-desc { font-size:0.72rem; color:var(--text2); }
+        .ms-badge { font-family:var(--ff-mono); font-size:0.55rem; font-weight:700; padding:3px 8px; border-radius:4px; border:1px solid; white-space:nowrap; }
+        .spec-block { border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; background:rgba(18,18,26,0.5); }
+        .spec-head { padding:0.65rem 1.2rem; font-family:var(--ff-mono); font-size:0.62rem; font-weight:600; text-transform:uppercase; background:rgba(0,0,0,0.3); color:var(--accent); }
+        .spec-table { width:100%; border-collapse:collapse; }
+        .spec-table tr { border-bottom:1px solid var(--border); }
+        .spec-table td { padding:10px 14px; font-size:0.76rem; }
+        .spec-id { font-family:var(--ff-mono); font-size:0.65rem; color:var(--accent); width:50px; }
+        .badge { font-family:var(--ff-mono); font-size:0.56rem; font-weight:600; padding:3px 8px; border-radius:4px; border:1px solid; }
+        .b-high { background:rgba(255,68,102,0.1); color:var(--red); border-color:rgba(255,68,102,0.3); }
+        .b-med { background:rgba(255,170,0,0.1); color:var(--amber); border-color:rgba(255,170,0,0.3); }
+        .b-low { background:rgba(0,255,136,0.1); color:var(--green); border-color:rgba(0,255,136,0.3); }
+        .comm-flow { display:flex; align-items:center; justify-content:center; gap:0; flex-wrap:wrap; padding:2rem 0; }
+        .comm-node { background:rgba(0,0,0,0.4); border:1px solid var(--border); padding:1rem 1.5rem; text-align:center; min-width:120px; border-radius:var(--radius); }
+        .comm-node-t { font-family:var(--ff-display); font-size:0.82rem; font-weight:700; color:var(--accent); }
+        .comm-node-s { font-size:0.65rem; color:var(--text2); margin-top:3px; }
+        .comm-arrow { display:flex; flex-direction:column; align-items:center; padding:0 0.75rem; }
+        .comm-arrow-sym { font-size:1.1rem; color:var(--accent); }
+        .comm-arrow-l { font-family:var(--ff-mono); font-size:0.55rem; color:var(--text2); }
+        .ml-card { background:rgba(18,18,26,0.7); border:1px solid var(--border); border-top:3px solid; padding:1.2rem; text-align:center; border-radius:var(--radius); }
+        .ml-card:hover { transform:translateY(-4px); }
+        .ml-icon { font-size:1.8rem; margin-bottom:0.35rem; }
+        .ml-name { font-family:var(--ff-display); font-size:0.82rem; font-weight:700; }
+        .ml-note { font-size:0.68rem; color:var(--text2); }
+        .bom-wrap { border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; background:rgba(18,18,26,0.5); }
+        .bom-table { width:100%; border-collapse:collapse; min-width:500px; }
+        .bom-table thead th { padding:10px 14px; font-family:var(--ff-mono); font-size:0.6rem; font-weight:600; text-transform:uppercase; text-align:left; background:rgba(0,0,0,0.3); color:var(--accent); }
+        .bom-table tbody tr { border-bottom:1px solid var(--border); }
+        .bom-table tbody td { padding:9px 14px; font-size:0.74rem; }
+        .qty-pill { display:inline-block; min-width:24px; text-align:center; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#000; font-family:var(--ff-mono); font-size:0.62rem; font-weight:700; padding:2px 7px; border-radius:4px; }
+        .bom-filters { display:flex; gap:0.3rem; flex-wrap:wrap; margin-bottom:0.85rem; }
+        .filter-btn { padding:5px 12px; border:1px solid var(--border); background:rgba(18,18,26,0.5); font-size:0.7rem; color:var(--text2); cursor:pointer; border-radius:6px; }
+        .filter-btn.active,.filter-btn:hover { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#000; border-color:transparent; }
+        .attr-card { background:rgba(18,18,26,0.7); border:1px solid var(--border); padding:1.1rem; border-radius:var(--radius); }
+        .attr-card:hover { border-color:rgba(0,255,136,0.3); }
+        .attr-icon { font-size:1.3rem; margin-bottom:0.35rem; }
+        .attr-name { font-family:var(--ff-display); font-size:0.82rem; font-weight:700; }
+        .attr-desc { font-size:0.7rem; color:var(--text2); margin-bottom:0.6rem; }
+        .attr-badge { font-family:var(--ff-mono); font-size:0.55rem; font-weight:600; padding:2px 7px; border-radius:4px; border:1px solid; display:inline-block; }
+        .risk-card { border:1px solid var(--border); border-left:3px solid var(--red); padding:1.2rem; border-radius:var(--radius); background:rgba(18,18,26,0.7); margin-bottom:0.65rem; }
+        .risk-card.med { border-left-color:var(--amber); }
+        .risk-card.low { border-left-color:var(--green); }
+        .risk-hd { display:flex; align-items:center; gap:0.6rem; margin-bottom:0.4rem; }
+        .risk-title { font-family:var(--ff-display); font-size:0.9rem; font-weight:700; }
+        .risk-mit { font-size:0.74rem; color:var(--text2); padding-left:1rem; border-left:2px solid var(--border); }
+        .triz-card { background:rgba(18,18,26,0.7); border:1px solid var(--border); padding:1.5rem; border-radius:var(--radius); }
+        .triz-num { font-family:var(--ff-display); font-size:2.5rem; font-weight:900; background:linear-gradient(135deg,rgba(0,212,255,0.15),transparent); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .triz-title { font-family:var(--ff-display); font-size:1rem; font-weight:700; }
+        .triz-sub { font-size:0.76rem; color:var(--text2); }
+        .triz-p { display:flex; gap:0.4rem; align-items:flex-start; font-size:0.76rem; padding:0.35rem 0; border-bottom:1px solid var(--border); }
+        .triz-p:last-child{border-bottom:none}
+        .triz-p::before { content:'▸'; color:var(--accent); font-weight:700; }
+        .triz-matrix-wrap { border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; background:rgba(18,18,26,0.5); }
+        .triz-mh { display:grid; grid-template-columns:140px 1fr 1fr 100px; background:rgba(0,0,0,0.3); }
+        .triz-mc { padding:0.7rem 0.85rem; font-family:var(--ff-mono); font-size:0.58rem; font-weight:600; text-transform:uppercase; color:var(--accent); border-right:1px solid var(--border); }
+        .triz-mrow { display:grid; grid-template-columns:140px 1fr 1fr 100px; border-bottom:1px solid var(--border); }
+        .triz-mcell { padding:0.7rem 0.85rem; font-size:0.72rem; border-right:1px solid var(--border); }
+        .triz-tag { font-family:var(--ff-mono); font-size:0.58rem; padding:3px 7px; border:1px solid var(--accent); color:var(--accent); border-radius:4px; }
+        .ifr-box { background:linear-gradient(135deg,rgba(0,212,255,0.05),rgba(180,77,255,0.05)); padding:2rem; border-radius:var(--radius); border:1px solid var(--border); border-left:4px solid var(--accent); }
+        .ifr-label { font-family:var(--ff-mono); font-size:0.6rem; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:var(--accent); margin-bottom:0.6rem; }
+        .ifr-text { font-family:var(--ff-display); font-size:0.9rem; font-style:italic; color:var(--text2); }
+        .tag-row { display:flex; gap:0.4rem; flex-wrap:wrap; margin-top:0.85rem; }
+        .t-tag { font-family:var(--ff-mono); font-size:0.58rem; padding:3px 8px; border:1px solid rgba(0,212,255,0.3); border-radius:4px; color:var(--accent); }
+        .slide-row { display:flex; gap:0.85rem; align-items:flex-start; padding:0.7rem 0; border-bottom:1px solid var(--border); }
+        .slide-row:last-child{border-bottom:none}
+        .slide-time { min-width:42px; font-family:var(--ff-mono); font-size:0.62rem; color:var(--accent); text-align:right; }
+        .slide-line { width:1px; background:var(--border); align-self:stretch; margin:0 5px; }
+        .slide-title { font-family:var(--ff-display); font-size:0.8rem; font-weight:700; }
+        .slide-desc { font-size:0.7rem; color:var(--text2); }
+        .presentation-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.92); backdrop-filter:blur(15px); z-index:10000; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.4s ease; }
+        .presentation-overlay.open { opacity:1; pointer-events:auto; }
+        .pres-container { width:90vw; max-width:1100px; height:80vh; max-height:700px; display:flex; flex-direction:column; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; box-shadow:0 30px 80px rgba(0,0,0,0.8); position:relative; }
+        .pres-topbar { display:flex; justify-content:space-between; align-items:center; padding:1rem 1.5rem; background:rgba(0,0,0,0.5); border-bottom:1px solid var(--border); }
+        .pres-topbar-left { display:flex; align-items:center; gap:0.75rem; }
+        .pres-logo { font-family:var(--ff-display); font-weight:700; font-size:0.9rem; color:var(--accent); }
+        .pres-progress { font-family:var(--ff-mono); font-size:0.7rem; color:var(--text2); }
+        .pres-close { background:none; border:1px solid var(--border); color:var(--text2); padding:0.5rem 1rem; border-radius:6px; cursor:pointer; font-size:0.8rem; font-weight:600; transition:all var(--transition); }
+        .pres-close:hover { border-color:var(--red); color:var(--red); background:rgba(255,68,102,0.1); }
+        .pres-slide-area { flex:1; position:relative; overflow:hidden; background:radial-gradient(ellipse at center, rgba(0,212,255,0.05) 0%, transparent 70%); }
+        .pres-slide { position:absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:3rem 4rem; text-align:center; opacity:0; transform:translateX(60px); transition:all 0.5s cubic-bezier(0.4,0,0.2,1); pointer-events:none; }
+        .pres-slide.active { opacity:1; transform:translateX(0); pointer-events:auto; }
+        .pres-slide.exit-left { opacity:0; transform:translateX(-60px); }
+        .pres-slide-number { font-family:var(--ff-mono); font-size:0.65rem; color:var(--accent); letter-spacing:2px; text-transform:uppercase; margin-bottom:1.5rem; padding:0.3rem 1rem; border:1px solid rgba(0,212,255,0.3); border-radius:20px; background:rgba(0,212,255,0.05); }
+        .pres-slide-title { font-family:var(--ff-display); font-size:2.8rem; font-weight:800; background:linear-gradient(135deg,#fff 0%,#c0c0d0 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:1rem; line-height:1.2; }
+        .pres-slide-subtitle { font-size:1rem; color:var(--text2); max-width:600px; margin-bottom:2rem; }
+        .pres-slide-list { list-style:none; padding:0; text-align:left; max-width:600px; width:100%; }
+        .pres-slide-list li { padding:0.6rem 0; border-bottom:1px solid var(--border); font-size:0.9rem; display:flex; align-items:center; gap:0.6rem; }
+        .pres-slide-list li::before { content:'▸'; color:var(--accent); font-weight:700; }
+        .pres-slide-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:0.8rem; max-width:700px; width:100%; text-align:left; }
+        .pres-slide-grid-item { background:rgba(255,255,255,0.03); border:1px solid var(--border); padding:1rem; border-radius:var(--radius-sm); text-align:center; }
+        .pres-slide-grid-item .icon { font-size:1.6rem; margin-bottom:0.3rem; }
+        .pres-slide-grid-item .label { font-family:var(--ff-display); font-size:0.75rem; font-weight:600; }
+        .pres-slide-big-icon { font-size:5rem; margin-bottom:1.5rem; animation:floatIcon 3s ease-in-out infinite; }
+        @keyframes floatIcon { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-15px)} }
+        .pres-slide-stats { display:flex; gap:0; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-top:1rem; }
+        .pres-slide-stat { padding:1.2rem 2rem; text-align:center; border-right:1px solid var(--border); flex:1; }
+        .pres-slide-stat:last-child{border-right:none}
+        .pres-slide-stat-v { font-family:var(--ff-display); font-size:1.8rem; font-weight:700; background:linear-gradient(135deg,var(--accent),var(--purple)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .pres-slide-stat-l { font-size:0.6rem; color:var(--text2); text-transform:uppercase; letter-spacing:1px; margin-top:0.2rem; }
+        .pres-nav { position:absolute; bottom:1.5rem; left:50%; transform:translateX(-50%); display:flex; gap:0.5rem; z-index:10; }
+        .pres-nav-dot { width:8px; height:8px; border-radius:50%; background:var(--border); cursor:pointer; transition:all var(--transition); }
+        .pres-nav-dot.active { background:var(--accent); box-shadow:0 0 10px var(--accent); width:20px; border-radius:10px; }
+        .pres-arrows { position:absolute; top:50%; transform:translateY(-50%); width:100%; display:flex; justify-content:space-between; padding:0 1rem; z-index:10; pointer-events:none; }
+        .pres-arrow { background:rgba(0,0,0,0.6); border:1px solid var(--border); color:#fff; width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1.2rem; transition:all var(--transition); pointer-events:auto; }
+        .pres-arrow:hover { background:rgba(0,212,255,0.2); border-color:var(--accent); }
+        .pres-arrow:disabled { opacity:0.3; cursor:default; }
+        .pres-timeline { position:absolute; bottom:0; left:0; width:100%; height:3px; background:var(--border); z-index:5; }
+        .pres-timeline-fill { height:100%; background:var(--accent); transition:width 0.5s ease; border-radius:0 2px 2px 0; }
+        .verbale-layout { display:flex; min-height:calc(100vh - 75px); }
+        .verbale-sidebar { width:300px; min-width:300px; background:rgba(18,18,26,0.7); border-right:1px solid var(--border); backdrop-filter:blur(15px); display:flex; flex-direction:column; height:calc(100vh - 75px); position:sticky; top:75px; overflow-y:auto; z-index:10; }
+        .sidebar-header { padding:1.2rem; border-bottom:1px solid var(--border); position:sticky; top:0; background:rgba(18,18,26,0.95); backdrop-filter:blur(15px); z-index:2; }
+        .sidebar-title { font-family:var(--ff-display); font-size:0.9rem; font-weight:700; }
+        .sidebar-subtitle { font-size:0.65rem; color:var(--text2); }
+        .sidebar-upload-btn { display:block; width:100%; padding:0.6rem; margin-top:0.65rem; background:transparent; border:2px dashed var(--border); border-radius:var(--radius-sm); color:var(--accent); font-size:0.7rem; font-weight:600; cursor:pointer; text-align:center; }
+        .sidebar-upload-btn:hover { border-color:var(--accent); background:rgba(0,212,255,0.05); }
+        .sidebar-upload-input { display:none; }
+        .sidebar-verbali-list { flex:1; overflow-y:auto; padding:0.4rem; }
+        .sidebar-verbale-item { padding:0.85rem; margin:0.25rem 0; border:1px solid var(--border); border-radius:var(--radius-sm); cursor:pointer; transition:all var(--transition); background:rgba(18,18,26,0.4); display:flex; justify-content:space-between; align-items:flex-start; position:relative; }
+        .sidebar-verbale-item:hover { border-color:var(--accent); background:rgba(0,212,255,0.05); }
+        .sidebar-verbale-item.active { border-color:var(--purple); background:rgba(180,77,255,0.1); }
+        .sidebar-verbale-info { flex:1; }
+        .sidebar-verbale-date { font-family:var(--ff-mono); font-size:0.55rem; color:var(--accent); }
+        .sidebar-verbale-title { font-family:var(--ff-display); font-size:0.75rem; font-weight:600; }
+        .sidebar-verbale-meta { font-size:0.58rem; color:var(--text2); }
+        .sidebar-verbale-delete { background:none; border:none; color:var(--text2); cursor:pointer; font-size:0.7rem; padding:0.15rem 0.35rem; border-radius:3px; }
+        .sidebar-verbale-delete:hover { color:var(--red); background:rgba(255,68,102,0.1); }
+        .sidebar-empty { text-align:center; padding:2rem 1rem; color:var(--text2); font-style:italic; font-size:0.75rem; }
+        .sidebar-footer { padding:0.6rem 0.85rem; border-top:1px solid var(--border); font-size:0.58rem; color:var(--text2); text-align:center; }
+        .verbale-main { flex:1; padding:1.5rem 2rem; overflow-y:auto; height:calc(100vh - 75px); }
+        .verbale-block { border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:0.85rem; background:rgba(18,18,26,0.5); }
+        .verbale-block.ai-updated { border-color:var(--purple)!important; box-shadow:0 0 15px rgba(180,77,255,0.2)!important; }
+        .verbale-hd { display:flex; align-items:center; gap:0.4rem; padding:0.6rem 1rem; background:rgba(0,0,0,0.3); border-bottom:1px solid var(--border); }
+        .verbale-hd-icon { font-size:0.75rem; }
+        .verbale-hd-title { font-family:var(--ff-display); font-size:0.7rem; font-weight:700; color:var(--accent); }
+        .verbale-body { padding:1rem; }
+        .vf { margin-bottom:0.7rem; }
+        .vf-l { font-family:var(--ff-mono); font-size:0.55rem; color:var(--accent); text-transform:uppercase; }
+        .vf-v { font-size:0.76rem; }
+        .vtask { display:flex; align-items:flex-start; gap:0.5rem; padding:0.4rem 0; border-bottom:1px solid var(--border); font-size:0.74rem; }
+        .vtask:last-child{border-bottom:none}
+        .vtask-cb { width:13px; height:13px; border:2px solid var(--border); border-radius:3px; flex-shrink:0; margin-top:2px; display:flex; align-items:center; justify-content:center; }
+        .vtask-label { flex:1; }
+        .vtask-who { font-family:var(--ff-mono); font-size:0.58rem; color:var(--accent); white-space:nowrap; }
+        .vtask-date { font-family:var(--ff-mono); font-size:0.55rem; color:var(--text2); white-space:nowrap; }
+        .ore-row { display:flex; align-items:center; gap:0.5rem; padding:0.35rem 0; font-size:0.74rem; }
+        .ore-name { flex:1; }
+        .ore-bw { flex:2; background:rgba(255,255,255,0.05); height:4px; border-radius:2px; overflow:hidden; }
+        .ore-bf { height:100%; background:linear-gradient(90deg,var(--accent),var(--purple)); border-radius:2px; }
+        .ore-v { font-family:var(--ff-mono); font-size:0.6rem; color:var(--accent); width:24px; text-align:right; }
+        .issue-row { display:flex; gap:0.5rem; padding:0.4rem 0; border-bottom:1px solid var(--border); font-size:0.74rem; }
+        .issue-dot { width:16px; height:16px; display:flex; align-items:center; justify-content:center; font-size:0.6rem; flex-shrink:0; }
+        .empty-state { text-align:center; padding:3rem 1rem; color:var(--text2); }
+        .empty-state-icon { font-size:2.5rem; margin-bottom:0.75rem; }
+        .empty-state-text { font-style:italic; }
+
+        /* ═══════════════ PAGE NAVIGATION ARROWS ═══════════════ */
+        .page-nav-arrow {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(18, 18, 26, 0.9);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 10px 20px;
+            cursor: pointer;
+            z-index: 500;
+            transition: all var(--transition);
+            text-decoration: none;
+            color: var(--text);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            animation: arrowPulse 2s ease-in-out infinite;
+        }
+        .page-nav-arrow:hover {
+            border-color: var(--accent);
+            background: rgba(0, 212, 255, 0.08);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
+            transform: translateX(-50%) translateY(-3px);
+        }
+        @keyframes arrowPulse {
+            0%, 100% { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }
+            50% { box-shadow: 0 10px 40px rgba(0, 212, 255, 0.15); }
+        }
+        .page-nav-arrow .arrow-icon {
+            font-size: 1.2rem;
+            color: var(--accent);
+            transition: all var(--transition);
+        }
+        .page-nav-arrow:hover .arrow-icon {
+            transform: translateY(3px);
+        }
+        .page-nav-arrow .arrow-text {
+            font-family: var(--ff-display);
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+        .page-nav-arrow .arrow-label {
+            font-family: var(--ff-mono);
+            font-size: 0.58rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .page-nav-arrow .arrow-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            line-height: 1.3;
+        }
+        @media (max-width: 768px) {
+            .page-nav-arrow {
+                bottom: 20px;
+                padding: 8px 16px;
+                gap: 8px;
+            }
+            .page-nav-arrow .arrow-text {
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+
+    <!-- ═══════════════ PAGE NAVIGATION ARROW ═══════════════ -->
+    <div class="page-nav-arrow" id="pageNavArrow" onclick="navigateToNextPage()" title="Vai alla pagina successiva">
+        <div class="arrow-info">
+            <span class="arrow-label" id="arrowLabel">PROSSIMA</span>
+            <span class="arrow-text" id="arrowText">Gestione Progetto</span>
+        </div>
+        <span class="arrow-icon">▼</span>
+    </div>
+
+    <!-- ═══════════════ CHAT WIDGET ═══════════════ -->
+    <div class="chat-widget" id="chatWidget">
+        <button class="chat-toggle" id="chatToggle" title="Chat AI">💬</button>
+        <div class="chat-panel" id="chatPanel">
+            <div class="chat-header">
+                <span class="chat-header-icon">🤖</span>
+                <div><div class="chat-header-title">CleaningBoat AI</div><div class="chat-header-subtitle">Risposte intelligenti sul progetto</div></div>
+                <button class="chat-close" id="chatClose">✕</button>
+            </div>
+            <div class="chat-suggestions" id="chatSuggestions">
+                <button class="chat-suggestion">Cos'è CleaningBoat?</button>
+                <button class="chat-suggestion">Chi è Luchini?</button>
+                <button class="chat-suggestion">Budget e tempistiche</button>
+                <button class="chat-suggestion">Quali rischi ci sono?</button>
+                <button class="chat-suggestion">Come funziona UART?</button>
+                <button class="chat-suggestion">Cosa fa Genzini?</button>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="chat-message bot">
+                    <div class="chat-avatar">🤖</div>
+                    <div class="chat-bubble">Ciao! Sono l'assistente AI di CleaningBoat EMBT03. Conosco ogni dettaglio del progetto: team, tecnologie, rischi, budget, specifiche e molto altro. Fammi una domanda! 👋</div>
+                </div>
+            </div>
+            <div class="chat-typing" id="chatTyping">
+                <div class="chat-typing-dot"></div><div class="chat-typing-dot"></div><div class="chat-typing-dot"></div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Chiedi qualcosa sul progetto..." />
+                <button class="chat-send" id="chatSend">Invia</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ PRESENTATION OVERLAY ═══════════════ -->
+    <div class="presentation-overlay" id="presentationOverlay">
+        <div class="pres-container">
+            <div class="pres-topbar"><div class="pres-topbar-left"><span class="pres-logo">⛵ CleaningBoat EMBT03</span><span class="pres-progress" id="presProgress">1/10</span></div><button class="pres-close" id="presClose">✕ Esci</button></div>
+            <div class="pres-slide-area" id="presSlideArea"></div>
+            <div class="pres-arrows"><button class="pres-arrow" id="presPrev" disabled>◀</button><button class="pres-arrow" id="presNext">▶</button></div>
+            <div class="pres-nav" id="presNav"></div>
+            <div class="pres-timeline"><div class="pres-timeline-fill" id="presTimelineFill" style="width:10%;"></div></div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ HOME PAGE ═══════════════ -->
+    <div id="page-home" class="page active" data-page="home" data-next="fase0" data-nextname="Gestione Progetto">
+        <header class="main-header">
+            <div class="logo" onclick="goto('home')"><div class="logo-icon">⛵</div>CleaningBoat <span>— EMBT03</span></div>
+            <nav class="main-nav">
+                <button class="nav-link" onclick="goto('fase0')">📋 Fase 0</button>
+                <button class="nav-link" onclick="goto('fase1')">📅 Fase 1</button>
+                <button class="nav-link" onclick="goto('specifiche')">📐 Specifiche</button>
+                <button class="nav-link" onclick="goto('bom')">📦 BOM</button>
+                <button class="nav-link" onclick="goto('triz')">🧠 TRIZ</button>
+                <button class="nav-link" onclick="goto('rischi')">🛡️ Rischi</button>
+                <button class="nav-link highlight" onclick="goto('verbale')">📝 Verbali</button>
+                <button class="nav-link highlight" style="color:var(--amber);border-color:rgba(255,170,0,0.4);" onclick="openPresentation()">📽️ Presentazione</button>
+                <button class="nav-link chat-highlight" onclick="openChat()">💬 AI Chat</button>
+            </nav>
+        </header>
+        <div class="hero-section">
+            <div class="hero-left">
+                <div class="hero-badge"><span class="hero-badge-dot"></span> Progetto ITS · 2025 · AI Vision System</div>
+                <h1 class="hero-title">Cleaning<br>Boat <em>Intelligenza Artificiale</em></h1>
+                <p class="hero-desc">Sistema di computer vision embedded per identificazione rifiuti plastici in ambiente acquatico. Pipeline TinyML su Arduino con Edge Impulse.</p>
+                <div class="hero-cta">
+                    <button class="btn-primary" onclick="openPresentation()">📽️ Avvia Presentazione</button>
+                    <button class="btn-secondary" onclick="goto('fase0')">Esplora progetto</button>
+                    <button class="btn-secondary" onclick="openChat()">💬 Chiedi all'AI</button>
+                </div>
+                <div class="hero-stats">
+                    <div class="hero-stat"><div class="hero-stat-v">~60h</div><div class="hero-stat-l">Budget</div></div>
+                    <div class="hero-stat"><div class="hero-stat-v">6</div><div class="hero-stat-l">Membri</div></div>
+                    <div class="hero-stat"><div class="hero-stat-v">≥80%</div><div class="hero-stat-l">Accuratezza</div></div>
+                    <div class="hero-stat"><div class="hero-stat-v">≤2s</div><div class="hero-stat-l">Latenza</div></div>
+                </div>
+            </div>
+        </div>
+        <div class="home-section">
+            <div class="home-section-header"><div class="home-section-eyebrow">Naviga il Progetto</div><h2 class="home-section-title">Esplora tutte le sezioni</h2></div>
+            <div class="quick-links-grid">
+                <div class="quick-link-card" onclick="goto('fase0')"><div class="quick-link-icon">👥</div><div class="quick-link-label">Fase 00</div><div class="quick-link-title">Team & Strumenti</div><div class="quick-link-desc">Chi siamo e quali tool usiamo</div></div>
+                <div class="quick-link-card" onclick="goto('fase1')"><div class="quick-link-icon">📅</div><div class="quick-link-label">Fase 01</div><div class="quick-link-title">Pianificazione</div><div class="quick-link-desc">Gantt, milestone, presentazione</div></div>
+                <div class="quick-link-card" onclick="goto('specifiche')"><div class="quick-link-icon">📐</div><div class="quick-link-label">Fase 03</div><div class="quick-link-title">Specifiche Tecniche</div><div class="quick-link-desc">Requisiti e protocollo UART</div></div>
+                <div class="quick-link-card" onclick="goto('bom')"><div class="quick-link-icon">📦</div><div class="quick-link-label">BOM</div><div class="quick-link-title">Bill of Materials</div><div class="quick-link-desc">Componenti e attrezzature</div></div>
+                <div class="quick-link-card" onclick="goto('triz')"><div class="quick-link-icon">🧠</div><div class="quick-link-label">Metodologia</div><div class="quick-link-title">Analisi TRIZ</div><div class="quick-link-desc">Problem solving inventivo</div></div>
+                <div class="quick-link-card" onclick="goto('rischi')"><div class="quick-link-icon">🛡️</div><div class="quick-link-label">Risk Mgmt</div><div class="quick-link-title">Rischi & Mitigazioni</div><div class="quick-link-desc">Identificazione proattiva</div></div>
+                <div class="quick-link-card" onclick="openPresentation()"><div class="quick-link-icon">📽️</div><div class="quick-link-label">Pitch Deck</div><div class="quick-link-title">Presentazione</div><div class="quick-link-desc">Avvia la presentazione</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ FASE 0 ═══════════════ -->
+    <div id="page-fase0" class="page" data-page="fase0" data-prev="home" data-prevname="Home" data-next="fase1" data-nextname="Pianificazione">
+        <nav class="inner-nav"><button class="inner-nav-back" onclick="goto('home')">← Home</button><div class="inner-nav-title"><span>Gestione Progetto</span><span class="inner-nav-tag">FASE 00</span></div><div class="inner-nav-links"><button class="inner-nav-link" onclick="goto('fase1')">Fase 1</button><button class="inner-nav-link" onclick="goto('specifiche')">Specifiche</button><button class="inner-nav-link" onclick="goto('bom')">BOM</button><button class="inner-nav-link" onclick="goto('triz')">TRIZ</button><button class="inner-nav-link" onclick="goto('rischi')">Rischi</button><button class="inner-nav-link" onclick="goto('verbale')">Verbale</button></div></nav>
+        <div class="ph"><div class="ph-band"></div><div class="ph-tag">Fase Trasversale — Impostazione</div><h1 class="ph-title">Gestione del Progetto</h1><p class="ph-sub">Struttura organizzativa, strumenti adottati e documentazione obbligatoria.</p></div>
+        <div class="pc"><div class="slabel">Il Team — 6 Membri</div><div class="g4" id="f0-team"></div><div class="alert alert-info" style="margin-top:1rem"><span>👥</span><span><strong>EMBT03:</strong> Luchini A., Genzini L., Bogdan M., Ayad C., Gianoglio G., Fionda G.</span></div><div class="slabel">Strumenti</div><div class="g2" id="f0-tools"></div><div class="slabel">Documentazione</div><div class="g2" id="f0-docs"></div></div>
+    </div>
+
+    <!-- ═══════════════ FASE 1 ═══════════════ -->
+    <div id="page-fase1" class="page" data-page="fase1" data-prev="fase0" data-prevname="Gestione Progetto" data-next="specifiche" data-nextname="Specifiche Tecniche">
+        <nav class="inner-nav"><button class="inner-nav-back" onclick="goto('home')">← Home</button><div class="inner-nav-title"><span>Pianificazione</span><span class="inner-nav-tag">FASE 01</span></div><div class="inner-nav-links"><button class="inner-nav-link" onclick="goto('fase0')">Fase 0</button><button class="inner-nav-link" onclick="goto('specifiche')">Specifiche</button><button class="inner-nav-link" onclick="goto('bom')">BOM</button><button class="inner-nav-link" onclick="goto('triz')">TRIZ</button><button class="inner-nav-link" onclick="goto('rischi')">Rischi</button><button class="inner-nav-link" onclick="goto('verbale')">Verbale</button></div></nav>
+        <div class="ph"><div class="ph-band"></div><div class="ph-tag">Scadenza — 14 Maggio 2025</div><h1 class="ph-title">Pianificazione</h1><p class="ph-sub">Diagramma di Gantt, milestone e struttura presentazione.</p></div>
+        <div class="pc"><div class="stat-row" id="f1-stats"></div><div class="slabel">Gantt</div><div class="gantt-wrap"><table class="gantt-table"><thead><tr><th>Attività</th><th>12–16 mag</th><th>19–23 mag</th><th>26–30 mag</th><th>2–6 giu</th><th>9–12 giu</th></tr></thead><tbody id="f1-gantt"></tbody></table></div><div class="slabel">Milestone</div><div class="ms-list" id="f1-ms"></div><div class="slabel">Presentazione (15 min)</div><div id="f1-slides"></div></div>
+    </div>
+
+    <!-- ═══════════════ SPECIFICHE ═══════════════ -->
+    <div id="page-specifiche" class="page" data-page="specifiche" data-prev="fase1" data-prevname="Pianificazione" data-next="bom" data-nextname="Bill of Materials">
+        <nav class="inner-nav"><button class="inner-nav-back" onclick="goto('home')">← Home</button><div class="inner-nav-title"><span>Specifiche</span><span class="inner-nav-tag">FASE 03</span></div><div class="inner-nav-links"><button class="inner-nav-link" onclick="goto('fase0')">Fase 0</button><button class="inner-nav-link" onclick="goto('fase1')">Fase 1</button><button class="inner-nav-link" onclick="goto('bom')">BOM</button><button class="inner-nav-link" onclick="goto('triz')">TRIZ</button><button class="inner-nav-link" onclick="goto('rischi')">Rischi</button><button class="inner-nav-link" onclick="goto('verbale')">Verbale</button></div></nav>
+        <div class="ph"><div class="ph-band"></div><div class="ph-tag">Scadenza — 21 Maggio 2025</div><h1 class="ph-title">Specifiche Tecniche</h1><p class="ph-sub">Requisiti funzionali, hardware e protocollo UART.</p></div>
+        <div class="pc"><div class="slabel">Requisiti Funzionali</div><div class="spec-block"><div class="spec-head">RF</div><div style="overflow-x:auto;"><table class="spec-table"><tbody id="sp-rf"></tbody></table></div></div><div class="slabel">Requisiti Hardware</div><div class="spec-block"><div class="spec-head">RH</div><div style="overflow-x:auto;"><table class="spec-table"><tbody id="sp-rh"></tbody></table></div></div><div class="slabel">Protocollo UART</div><div class="card"><div class="comm-flow"><div class="comm-node"><div class="comm-node-t">Arduino P3</div></div><div class="comm-arrow"><div class="comm-arrow-sym">→</div></div><div class="comm-node" style="background:rgba(0,212,255,0.1);"><div class="comm-node-t" style="color:var(--accent);">UART 9600</div></div><div class="comm-arrow"><div class="comm-arrow-sym">→</div></div><div class="comm-node"><div class="comm-node-t">Arduino P4</div></div></div></div><div class="slabel">Classi ML</div><div class="g4" id="sp-classi"></div></div>
+    </div>
+
+    <!-- ═══════════════ BOM ═══════════════ -->
+    <div id="page-bom" class="page" data-page="bom" data-prev="specifiche" data-prevname="Specifiche Tecniche" data-next="triz" data-nextname="Analisi TRIZ">
+        <nav class="inner-nav"><button class="inner-nav-back" onclick="goto('home')">← Home</button><div class="inner-nav-title"><span>BOM</span><span class="inner-nav-tag">MATERIALI</span></div><div class="inner-nav-links"><button class="inner-nav-link" onclick="goto('fase0')">Fase 0</button><button class="inner-nav-link" onclick="goto('fase1')">Fase 1</button><button class="inner-nav-link" onclick="goto('specifiche')">Specifiche</button><button class="inner-nav-link" onclick="goto('triz')">TRIZ</button><button class="inner-nav-link" onclick="goto('rischi')">Rischi</button><button class="inner-nav-link" onclick="goto('verbale')">Verbale</button></div></nav>
+        <div class="ph"><div class="ph-band"></div><div class="ph-tag">Materiali & Attrezzature</div><h1 class="ph-title">Bill of Materials</h1><p class="ph-sub">Componenti per il sistema di riconoscimento.</p></div>
+        <div class="pc"><div class="stat-row" id="bom-stats"></div><div class="slabel">Componenti</div><div class="bom-filters" id="bom-filters"></div><div style="overflow-x:auto;" class="bom-wrap"><table class="bom-table"><thead><tr><th>#</th><th>Componente</th><th>Qtà</th><th>Utilizzo</th><th>Categoria</th></tr></thead><tbody id="bom-tbody"></tbody></table></div><div class="slabel">Attrezzature</div><div class="g4" id="bom-attr"></div></div>
+    </div>
+
+    <!-- ═══════════════ TRIZ ═══════════════ -->
+    <div id="page-triz" class="page" data-page="triz" data-prev="bom" data-prevname="Bill of Materials" data-next="rischi" data-nextname="Rischi & Mitigazioni">
+        <nav class="inner-nav"><button class="inner-nav-back" onclick="goto('home')">← Home</button><div class="inner-nav-title"><span>TRIZ</span><span class="inner-nav-tag">INVENTIVA</span></div><div class="inner-nav-links"><button class="inner-nav-link" onclick="goto('fase0')">Fase 0</button><button class="inner-nav-link" onclick="goto('fase1')">Fase 1</button><button class="inner-nav-link" onclick="goto('specifiche')">Specifiche</button><button class="inner-nav-link" onclick="goto('bom')">BOM</button><button class="inner-nav-link" onclick="goto('rischi')">Rischi</button><button class="inner-nav-link" onclick="goto('verbale')">Verbale</button></div></nav>
+        <div class="ph"><div class="ph-band"></div><div class="ph-tag">Metodologia</div><h1 class="ph-title">Analisi TRIZ</h1><p class="ph-sub">Problem solving inventivo applicato.</p></div>
+        <div class="pc"><div class="card card-teal"><div style="font-family:var(--ff-display);font-size:1.1rem;font-weight:700;">🧠 Cos'è TRIZ?</div><p style="font-size:.8rem;color:var(--text2);">Metodologia basata su 400.000+ brevetti. I problemi nascono da <strong style="color:var(--accent);">contraddizioni</strong>.</p></div><div class="slabel">Contraddizioni</div><div class="g2" id="triz-contr"></div><div class="slabel">Matrice</div><div class="triz-matrix-wrap"><div class="triz-mh"><div class="triz-mc">Contraddizione</div><div class="triz-mc">Migliorato</div><div class="triz-mc">Peggiorato</div><div class="triz-mc">Principi</div></div><div id="triz-matrix-rows"></div></div><div class="slabel">IFR</div><div class="ifr-box"><div class="ifr-label">Sistema Ideale</div><div class="ifr-text">"Il sistema si esegue da solo, identificando qualsiasi rifiuto con accuratezza perfetta."</div></div></div>
+    </div>
+
+    <!-- ═══════════════ RISCHI ═══════════════ -->
+    <div id="page-rischi" class="page" data-page="rischi" data-prev="triz" data-prevname="Analisi TRIZ" data-next="verbale" data-nextname="Verbali">
+        <nav class="inner-nav"><button class="inner-nav-back" onclick="goto('home')">← Home</button><div class="inner-nav-title"><span>Rischi</span><span class="inner-nav-tag">RISK</span></div><div class="inner-nav-links"><button class="inner-nav-link" onclick="goto('fase0')">Fase 0</button><button class="inner-nav-link" onclick="goto('fase1')">Fase 1</button><button class="inner-nav-link" onclick="goto('specifiche')">Specifiche</button><button class="inner-nav-link" onclick="goto('bom')">BOM</button><button class="inner-nav-link" onclick="goto('triz')">TRIZ</button><button class="inner-nav-link" onclick="goto('verbale')">Verbale</button></div></nav>
+        <div class="ph"><div class="ph-band"></div><div class="ph-tag">Risk Management</div><h1 class="ph-title">Rischi & Mitigazioni</h1><p class="ph-sub">Analisi completa dei rischi tecnici, organizzativi e ambientali.</p></div>
+        <div class="pc"><div id="rischi-list"></div></div>
+    </div>
+
+    <!-- ═══════════════ VERBALE ═══════════════ -->
+    <div id="page-verbale" class="page" data-page="verbale" data-prev="rischi" data-prevname="Rischi & Mitigazioni" data-next="home" data-nextname="Torna alla Home">
+        <header class="main-header">
+            <div class="logo" onclick="goto('home')"><div class="logo-icon">⛵</div>CleaningBoat <span>— EMBT03</span></div>
+            <nav class="main-nav">
+                <button class="nav-link" onclick="goto('home')">🏠 Home</button>
+                <button class="nav-link" onclick="goto('fase0')">Fase 0</button>
+                <button class="nav-link" onclick="goto('fase1')">Fase 1</button>
+                <button class="nav-link" onclick="goto('specifiche')">Specifiche</button>
+                <button class="nav-link" onclick="goto('bom')">BOM</button>
+                <button class="nav-link" onclick="goto('triz')">TRIZ</button>
+                <button class="nav-link" onclick="goto('rischi')">Rischi</button>
+                <button class="nav-link highlight">📝 Verbali</button>
+            </nav>
+        </header>
+        <div class="verbale-layout">
+            <div class="verbale-sidebar">
+                <div class="sidebar-header"><div class="sidebar-title">📝 I Miei Verbali</div><div class="sidebar-subtitle" id="sidebarCount">Nessun verbale caricato</div><button class="sidebar-upload-btn" id="sidebarUploadBtn">📤 Carica nuovo verbale</button><input type="file" class="sidebar-upload-input" id="sidebarUploadInput" accept=".pdf,.docx,.md,.txt"></div>
+                <div class="sidebar-verbali-list" id="sidebarVerbaliList"><div class="sidebar-empty">📭 Nessun verbale.</div></div>
+                <div class="sidebar-footer">💾 Salvati nel browser</div>
+            </div>
+            <div class="verbale-main">
+                <div class="ph-mini"><div class="ph-tag">🤖 Sistema AI</div><h1 class="ph-title" style="font-size:1.8rem;">Dettaglio Verbale</h1></div>
+                <div class="empty-state" id="emptyState"><div class="empty-state-icon">📋</div><div class="empty-state-text">Seleziona un verbale o carica un file.</div></div>
+                <div id="verbaleContent" style="display:none;">
+                    <div class="alert alert-info" id="verbaleFileInfo"></div>
+                    <div class="slabel">📋 Informazioni</div><div class="verbale-block"><div class="verbale-hd"><span class="verbale-hd-icon">📋</span><span class="verbale-hd-title">Header</span></div><div class="verbale-body"><div class="g2"><div><div class="vf"><div class="vf-l">Data</div><div class="vf-v" id="field-data">—</div></div><div class="vf"><div class="vf-l">Luogo</div><div class="vf-v" id="field-luogo">—</div></div><div class="vf"><div class="vf-l">Durata</div><div class="vf-v" id="field-durata">—</div></div></div><div><div class="vf"><div class="vf-l">Presenti</div><div class="vf-v" id="field-presenti">—</div></div><div class="vf"><div class="vf-l">Tipologia</div><div class="vf-v" id="field-tipologia">—</div></div></div></div></div></div>
+                    <div class="slabel">✅ Attività</div><div class="verbale-block"><div class="verbale-hd"><span class="verbale-hd-icon">✅</span><span class="verbale-hd-title">Attività</span></div><div class="verbale-body" id="field-attivita"></div></div>
+                    <div class="slabel">🐛 Problemi</div><div class="verbale-block"><div class="verbale-hd"><span class="verbale-hd-icon">🐛</span><span class="verbale-hd-title">Problemi</span></div><div class="verbale-body" id="field-problemi"></div></div>
+                    <div class="slabel">⚖️ Decisioni</div><div class="verbale-block"><div class="verbale-hd"><span class="verbale-hd-icon">⚖️</span><span class="verbale-hd-title">Decisioni</span></div><div class="verbale-body" id="field-decisioni"></div></div>
+                    <div class="slabel">⏱️ Ore</div><div class="verbale-block"><div class="verbale-hd"><span class="verbale-hd-icon">⏱️</span><span class="verbale-hd-title">Ore</span></div><div class="verbale-body" id="field-ore"></div></div>
+                    <div class="slabel">📌 Prossimi Passi</div><div class="verbale-block"><div class="verbale-hd"><span class="verbale-hd-icon">📌</span><span class="verbale-hd-title">Prossimi Passi</span></div><div class="verbale-body" id="field-passi"></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ═══════════ ROUTING ═══════════
+            const pageOrder = ['home', 'fase0', 'fase1', 'specifiche', 'bom', 'triz', 'rischi', 'verbale'];
+            const pageNames = {
+                'home': 'Home',
+                'fase0': 'Gestione Progetto',
+                'fase1': 'Pianificazione',
+                'specifiche': 'Specifiche Tecniche',
+                'bom': 'Bill of Materials',
+                'triz': 'Analisi TRIZ',
+                'rischi': 'Rischi & Mitigazioni',
+                'verbale': 'Verbali'
+            };
+
+            function goto(id) {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                const target = document.getElementById('page-' + id);
+                if (target) { 
+                    target.classList.add('active'); 
+                    window.scrollTo({ top: 0, behavior: 'smooth' }); 
+                    updateNavArrow(id);
+                }
+                history.replaceState(null, '', '#' + id);
+            }
+            window.goto = goto;
+
+            function navigateToNextPage() {
+                const activePage = document.querySelector('.page.active');
+                if (!activePage) return;
+                const nextPage = activePage.dataset.next;
+                if (nextPage) goto(nextPage);
+            }
+            window.navigateToNextPage = navigateToNextPage;
+
+            function updateNavArrow(currentPageId) {
+                const activePage = document.querySelector(`[data-page="${currentPageId}"]`);
+                const arrowEl = document.getElementById('pageNavArrow');
+                const arrowLabel = document.getElementById('arrowLabel');
+                const arrowText = document.getElementById('arrowText');
+                
+                if (!activePage || !arrowEl) return;
+                
+                const nextPage = activePage.dataset.next;
+                const nextPageName = activePage.dataset.nextname;
+                
+                if (nextPage && nextPageName) {
+                    arrowEl.style.display = 'flex';
+                    arrowLabel.textContent = 'PROSSIMA PAGINA';
+                    arrowText.textContent = nextPageName;
+                } else {
+                    arrowEl.style.display = 'flex';
+                    arrowLabel.textContent = 'TORNA';
+                    arrowText.textContent = 'Home';
+                }
+            }
+
+            window.addEventListener('load', () => { 
+                const hash = location.hash.slice(1); 
+                if (hash) {
+                    goto(hash);
+                } else {
+                    updateNavArrow('home');
+                }
+            });
+
+            // ═══════════ KNOWLEDGE BASE ═══════════
+            const knowledgeBase = {
+                progetto: { keywords: ["cos'è","cosa è","progetto","cleaningboat","embt03","descrizione","obiettivo","scopo","di cosa","in cosa consiste"], response: "🚀 **CleaningBoat EMBT03** è un progetto ITS 2025 che sviluppa un sistema di **computer vision embedded** per identificare rifiuti plastici galleggianti in tempo reale.\n\n• Usa **Intelligenza Artificiale su microcontrollore** (TinyML)\n• Riconosce **6 categorie** di rifiuti plastici\n• Comunica via **UART** con un sistema di raccolta (Progetto 4)\n• Budget: **~60 ore** totali\n• Team: **6 membri**\n• Tecnologia: **Edge Impulse + Arduino Uno Q**" },
+                team: { keywords: ["team","membri","gruppo","chi","nomi","ruoli","organizzazione"], response: "👥 **Team EMBT03 — 6 membri:**\n\n• **Luchini Alessandro** — Referente/PM (coordinamento, IA, BOM, schema elettrico)\n• **Genzini Lorenzo** — HW/SW Lead (modello CAD, sviluppo sito, IA, labeling)\n• **Bogdan Matteo** — Software (librerie, Arduino, training ML)\n• **Ayad Chakib** — Documentazione (verbali, labeling, ricerca immagini)\n• **Gianoglio Giovanni** — Software (librerie, Arduino, stampa 3D, IA)\n• **Fionda Gianluca** — Documentazione/Software (IA, labeling, training ML)" },
+                luchini: { keywords: ["luchini","alessandro","referente","pm","project manager"], response: "👤 **Luchini Alessandro** è il **Referente/PM** del progetto. Si occupa di:\n• Coordinamento del gruppo\n• Monitoraggio scadenze\n• Addestramento IA\n• Ricerca immagini\n• Bill of Materials (BOM)\n• Stesura verbali\n• Schema elettrico\n• Labeling dataset" },
+                genzini: { keywords: ["genzini","lorenzo","hardware","hw"], response: "👤 **Genzini Lorenzo** è l'**Hardware/Software Lead**. Si occupa di:\n• Addestramento IA\n• Modello CAD (NX Siemens)\n• Sviluppo del sito web del progetto\n• Bill of Materials (BOM)\n• Stesura verbali\n• Labeling dataset" },
+                bogdan: { keywords: ["bogdan","matteo","software","sw"], response: "👤 **Bogdan Matteo** è nel team **Software**. Si occupa di:\n• Installazione librerie\n• Gestione Arduino Uno Q\n• Training del modello ML" },
+                ayad: { keywords: ["ayad","chakib","documentazione","doc"], response: "👤 **Ayad Chakib** è nel team **Documentazione**. Si occupa di:\n• Stesura verbali\n• Labeling dataset\n• Ricerca immagini" },
+                gianoglio: { keywords: ["gianoglio","giovanni"], response: "👤 **Gianoglio Giovanni** è nel team **Software**. Si occupa di:\n• Installazione librerie\n• Gestione Arduino Uno Q\n• Training ML\n• Correzione stampa 3D\n• Addestramento IA" },
+                fionda: { keywords: ["fionda","gianluca"], response: "👤 **Fionda Gianluca** è nel team **Documentazione/Software**. Si occupa di:\n• Addestramento IA\n• Labeling dataset\n• Ricerca immagini\n• Training ML" },
+                tecnologia: { keywords: ["tecnologia","tecnologie","stack","edge impulse","tinyml","arduino","mobilenet","modello","ml","ai","intelligenza artificiale","come funziona"], response: "🔧 **Stack Tecnologico:**\n\n• **Hardware:** Arduino Uno Q + Camera ELP USB 8MP\n• **ML Framework:** Edge Impulse (training cloud)\n• **Modello:** MobileNetV1 96×96 pixel in scala di grigi\n• **Ottimizzazione:** Quantizzazione INT8 per ridurre RAM/Flash\n• **Comunicazione:** UART 9600 baud con Progetto 4\n• **Alimentazione:** Powerbank 5V standalone\n• **Meccanica:** Supporto camera stampato in 3D (PLA + vernice impermeabilizzante)\n• **CAD:** NX Siemens per il disegno del supporto" },
+                budget: { keywords: ["budget","ore","costo","tempo","tempistiche","scadenze","milestone","quando","calendario","pianificazione"], response: "💰 **Budget e Tempistiche:**\n\n• Budget totale: **~60 ore**\n• Maggio 2025: ~40 ore\n• Giugno 2025: ~20 ore\n\n📅 **Milestone:**\n• **14 maggio** — Presentazione piano progetto\n• **21 maggio** — Specifiche tecniche + BOM\n• **26-30 maggio** — Setup hardware + dataset\n• **2-6 giugno** — Training modello ML\n• **9-12 giugno** — Collaudo finale" },
+                uart: { keywords: ["uart","comunicazione","progetto 4","seriale","protocollo","baud","collegamento","trasmissione"], response: "🔌 **Protocollo UART con Progetto 4:**\n\n• **Baud rate:** 9600\n• **Formato:** `CLASSE:angolo:distanza`\n• **Collegamento:** TX (P3) → RX (P4), GND comune\n• **Frequenza:** 1 messaggio ogni ~200ms\n• **Dati trasmessi:** tipo di rifiuto, posizione angolare, distanza stimata\n\n⚠️ **Nota importante:** Il GND comune tra i due Arduino è fondamentale! Senza, i segnali non vengono interpretati correttamente." },
+                classi: { keywords: ["classi","categorie","rifiuti","riconosce","oggetti","bottiglia","lattina","busta","bicchiere","tappo","cartaccia"], response: "🏷️ **6 Classi di Rifiuti Riconosciute:**\n\n1. 🍶 **Bottiglia** — plastica, forma cilindrica\n2. 🥫 **Lattina** — alluminio, superficie riflettente\n3. 🛍️ **Busta** — plastica flessibile, forma irregolare\n4. 🥃 **Bicchiere** — plastica, forma troncoconica\n5. 🫙 **Tappo** — piccolo, la classe più difficile\n6. 🍬 **Cartaccia** — involucri, colori variabili" },
+                rischi: { keywords: ["rischi","problemi","pericoli","mitigazione","criticità","cosa può andare","fallire"], response: "⚠️ **Analisi dei Rischi (3 categorie):**\n\n🔧 **Tecnici (9 rischi):**\n• 🔴 Mancato UART → Test entro 23/5\n• 🔴 Accuratezza <80% → Dataset 500+ immagini\n• 🟡 Latenza >2s → Ottimizzazione INT8\n• 🟡 Overfitting → Data augmentation\n• 🟡 Guasto HW → Scheda di riserva\n• 🟡 Surriscaldamento → Fori ventilazione\n• 🟡 Impermeabilità → Vernice + silicone\n\n👥 **Organizzativi (5 rischi):**\n• 🔴 Ritardo milestone → Buffer 2-3 giorni\n• 🟡 Assenza membro → Backup designato\n• 🟡 Comunicazione → Verbali + GitHub\n\n🌍 **Ambientali (5 rischi):**\n• 🟡 Meteo avverso → Data backup\n• 🟡 Luce diretta → Paraluce 3D\n• 🟡 Onde/schizzi → Doppia protezione" },
+                triz: { keywords: ["triz","metodologia","inventiva","contraddizione","ifr","ideale","problem solving"], response: "🧠 **Analisi TRIZ:**\n\nMetodologia basata su **400.000+ brevetti** analizzati. I problemi nascono da **contraddizioni**.\n\n⚡ **Contraddizioni identificate:**\n1. **Accuratezza vs Latenza** — Principi: 10, 24, 35\n2. **Robustezza vs Peso Computazionale** — Principi: 15, 29, 37\n3. **Impermeabilità vs Dissipazione**\n\n💡 **IFR (Ideal Final Result):**\n\"Il sistema si esegue da solo, identificando qualsiasi rifiuto con accuratezza perfetta.\"" },
+                bom: { keywords: ["bom","materiali","componenti","hardware","costo","prezzo","cosa serve","attrezzature"], response: "📦 **Bill of Materials:**\n\n• **Arduino Uno Q** (2 unità) — Board con acceleratore ML\n• **Camera ELP USB** (1 unità) — Acquisizione immagini 8MP\n• **Powerbank 5V** (1 unità) — Alimentazione standalone\n• **Fili jumper M-M** (3 unità) — Collegamenti UART\n• **PLA** (~100g) — Filamento per stampa 3D\n• **Vernice acrilica** — Impermeabilizzazione supporto\n\n🛠️ **Attrezzature:** Stampante 3D, PC con Edge Impulse, NX Siemens (CAD), calibro, lime, trapano, cacciaviti." },
+                strumenti: { keywords: ["strumenti","tool","github","notion","drive","repository","task","kanban"], response: "🛠️ **Strumenti utilizzati:**\n\n• 🐙 **GitHub** — Repository e versionamento codice\n• 📋 **Notion** — Task board Kanban per gestione attività\n• 📁 **Google Drive** — Documenti condivisi e file di progetto\n• 🖨️ **Stampante 3D** — Per il supporto della camera\n• 💻 **Edge Impulse** — Piattaforma cloud per training ML\n• 📐 **NX Siemens** — Software CAD per disegno tecnico" },
+                performance: { keywords: ["accuratezza","precisione","latenza","velocità","performance","prestazioni","metriche","risultati"], response: "📊 **Metriche di Performance:**\n\n• **Accuratezza target:** ≥80% (raggiunto 84% con data augmentation)\n• **Latenza target:** ≤2 secondi per frame (misurato 1.8s)\n• **RAM utilizzata:** ~200KB con quantizzazione INT8\n• **Classi:** 6 categorie di rifiuti\n• **Dataset:** 500+ immagini in condizioni variabili" },
+                presentazione: { keywords: ["presentazione","slide","pitch","deck","powerpoint"], response: "📽️ **Presentazione (15 minuti, 10 slide):**\n\n1. Copertina & Team\n2. Il Problema (inquinamento plastica)\n3. Obiettivi del Progetto\n4. Tecnologia & Stack\n5. Pianificazione (Gantt + Milestone)\n6. Metodologia TRIZ\n7. Rischi & Mitigazioni\n8. Classi di Rifiuti\n9. Risultati Attesi\n10. Q&A\n\nClicca su **📽️ Presentazione** nella navbar per avviare la presentazione interattiva!" }
+            };
+
+            // ═══════════ CHAT SYSTEM ═══════════
+            const chatToggle = document.getElementById('chatToggle');
+            const chatPanel = document.getElementById('chatPanel');
+            const chatClose = document.getElementById('chatClose');
+            const chatMessages = document.getElementById('chatMessages');
+            const chatInput = document.getElementById('chatInput');
+            const chatSend = document.getElementById('chatSend');
+            const chatTyping = document.getElementById('chatTyping');
+            const chatSuggestions = document.getElementById('chatSuggestions');
+
+            function findBestMatch(query) {
+                const q = query.toLowerCase().trim();
+                let bestMatch = null;
+                let bestScore = 0;
+                for (const [topicName, topicData] of Object.entries(knowledgeBase)) {
+                    let score = 0;
+                    for (const keyword of topicData.keywords) {
+                        if (q.includes(keyword.toLowerCase())) { score += 2; if (keyword.length > 5) score += 1; }
+                    }
+                    const words = q.split(/\s+/);
+                    for (const word of words) { if (topicData.keywords.some(k => k === word)) score += 3; }
+                    if (score > bestScore) { bestScore = score; bestMatch = topicData; }
+                }
+                if (bestScore >= 2) return bestMatch.response;
+                if (bestScore > 0) return bestMatch.response;
+                return null;
+            }
+
+            function addMessage(text, isUser = false) {
+                const msg = document.createElement('div');
+                msg.className = `chat-message ${isUser ? 'user' : 'bot'}`;
+                msg.innerHTML = `<div class="chat-avatar">${isUser ? '👤' : '🤖'}</div><div class="chat-bubble">${text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>')}</div>`;
+                chatMessages.appendChild(msg);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            function processQuery(text) {
+                if (!text.trim()) return;
+                addMessage(text, true);
+                chatInput.value = '';
+                chatTyping.classList.add('active');
+                setTimeout(() => {
+                    chatTyping.classList.remove('active');
+                    const response = findBestMatch(text);
+                    if (response) { addMessage(response, false); }
+                    else { addMessage('🤔 Non ho trovato una risposta specifica.\n\nProva a chiedermi:\n• Cos\'è CleaningBoat?\n• Chi è [nome membro]?\n• Budget e tempistiche\n• Quali tecnologie usate?\n• Come funziona UART?\n• Quali rischi ci sono?\n• Cos\'è TRIZ?\n• Quali classi di rifiuti?\n• BOM e componenti', false); }
+                }, 500 + Math.random() * 300);
+            }
+
+            function openChat() { chatPanel.classList.add('open'); chatToggle.classList.add('active'); chatToggle.textContent = '✕'; }
+            function closeChat() { chatPanel.classList.remove('open'); chatToggle.classList.remove('active'); chatToggle.textContent = '💬'; }
+            chatToggle.addEventListener('click', () => { chatPanel.classList.contains('open') ? closeChat() : openChat(); });
+            chatClose.addEventListener('click', closeChat);
+            chatSend.addEventListener('click', () => processQuery(chatInput.value));
+            chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') processQuery(chatInput.value); });
+            chatSuggestions.addEventListener('click', (e) => { if (e.target.classList.contains('chat-suggestion')) processQuery(e.target.textContent); });
+            window.openChat = openChat;
+
+            // ═══════════ PRESENTATION ═══════════
+            const slidesData = [
+                { number:'01', title:'CleaningBoat EMBT03', subtitle:'Sistema AI per il riconoscimento di rifiuti plastici in acqua', type:'cover', icon:'⛵', content:['Progetto ITS 2025','Intelligenza Artificiale su Microcontrollore','Computer Vision con Edge Impulse'] },
+                { number:'02', title:'Il Team', subtitle:'6 persone, un obiettivo comune', type:'cover', icon:'👥', content:['Luchini A. — Referente PM','Genzini L. — HW/SW Lead','Bogdan M. — Software','Ayad C. — Documentazione','Gianoglio G. — Software','Fionda G. — Documentazione/Software'] },
+                { number:'03', title:'Il Problema', subtitle:'Inquinamento da plastica', type:'cover', icon:'🌊', content:['8 milioni di tonnellate/anno negli oceani','I fiumi sono i principali vettori','Raccolta manuale lenta e costosa','Serve un sistema autonomo di identificazione'] },
+                { number:'04', title:'Obiettivi', subtitle:'Cosa vogliamo realizzare', type:'cover', icon:'🎯', content:['Riconoscere 6 classi di rifiuti con AI','Latenza ≤2 secondi per frame','Accuratezza ≥80%','Comunicazione UART con Progetto 4','Supporto 3D impermeabilizzato','Funzionamento standalone a batteria'] },
+                { number:'05', title:'Tecnologia', subtitle:'Hardware, software e ML', type:'cover', icon:'🧠', content:['Arduino Uno Q + Camera ELP USB','Edge Impulse per training','MobileNetV1 96×96 grayscale','Quantizzazione INT8','UART 9600 baud','Powerbank 5V'] },
+                { number:'06', title:'Pianificazione', subtitle:'Gantt e Milestone', type:'cover', icon:'📅', content:['14 maggio — Presentazione piano','21 maggio — Specifiche + BOM','26-30 maggio — Setup HW + Dataset','2-6 giugno — Training ML','9-12 giugno — Collaudo finale'] },
+                { number:'07', title:'TRIZ', subtitle:'Problem solving inventivo', type:'cover', icon:'🧠', content:['400.000+ brevetti analizzati','Contraddizione 1: Accuratezza vs Latenza','Contraddizione 2: Robustezza vs Peso','IFR: Sistema ideale auto-eseguibile'] },
+                { number:'08', title:'Rischi', subtitle:'Cosa può andare storto', type:'cover', icon:'🛡️', content:['🔴 UART → Test incrociato entro 23/5','🔴 Accuratezza <80% → 500+ immagini','🟡 Stampa 3D → Prenotazione anticipata','🟡 Surriscaldamento → Ventilazione'] },
+                { number:'09', title:'Risultati Attesi', subtitle:'Metriche di performance', type:'cover', icon:'📊', content:['Accuratezza: ≥80% (target)','Latenza: ≤2 secondi','6 classi di rifiuti','Budget: ~60 ore totali'] },
+                { number:'10', title:'Grazie!', subtitle:'Domande?', type:'cover', icon:'🙏', content:['EMBT03 — CleaningBoat','Progetto ITS 2025'] }
+            ];
+            let currentSlide = 0;
+            const totalSlides = slidesData.length;
+            const overlay = document.getElementById('presentationOverlay');
+            const slideArea = document.getElementById('presSlideArea');
+            const presProgress = document.getElementById('presProgress');
+            const presTimelineFill = document.getElementById('presTimelineFill');
+            const presNav = document.getElementById('presNav');
+            const presPrev = document.getElementById('presPrev');
+            const presNext = document.getElementById('presNext');
+            const presClose = document.getElementById('presClose');
+
+            function buildAllSlides() {
+                slideArea.innerHTML = '';
+                slidesData.forEach((slide, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'pres-slide';
+                    div.innerHTML = `<div class="pres-slide-number">SLIDE ${slide.number} / ${totalSlides}</div>
+                        <div class="pres-slide-big-icon">${slide.icon}</div>
+                        <div class="pres-slide-title">${slide.title}</div>
+                        <div class="pres-slide-subtitle">${slide.subtitle}</div>
+                        <ul class="pres-slide-list" style="text-align:center;">${slide.content.map(c => `<li style="justify-content:center;">${c}</li>`).join('')}</ul>`;
+                    div.dataset.index = index;
+                    slideArea.appendChild(div);
+                });
+                presNav.innerHTML = '';
+                for (let i = 0; i < totalSlides; i++) {
+                    const dot = document.createElement('div');
+                    dot.className = 'pres-nav-dot';
+                    if (i === 0) dot.classList.add('active');
+                    dot.addEventListener('click', () => goToSlide(i));
+                    presNav.appendChild(dot);
+                }
+            }
+            function updateSlideUI() {
+                const allSlides = slideArea.querySelectorAll('.pres-slide');
+                allSlides.forEach((s, i) => { s.classList.remove('active'); if (i === currentSlide) s.classList.add('active'); });
+                presProgress.textContent = `${currentSlide + 1}/${totalSlides}`;
+                presTimelineFill.style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+                presPrev.disabled = currentSlide === 0;
+                presNext.disabled = currentSlide === totalSlides - 1;
+                const dots = presNav.querySelectorAll('.pres-nav-dot');
+                dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+            }
+            function goToSlide(index) { if (index < 0 || index >= totalSlides) return; currentSlide = index; updateSlideUI(); }
+            function openPresentation() { buildAllSlides(); currentSlide = 0; updateSlideUI(); overlay.classList.add('open'); document.body.style.overflow = 'hidden'; }
+            function closePresentation() { overlay.classList.remove('open'); document.body.style.overflow = ''; }
+            presPrev.addEventListener('click', () => { if (currentSlide > 0) goToSlide(currentSlide - 1); });
+            presNext.addEventListener('click', () => { if (currentSlide < totalSlides - 1) goToSlide(currentSlide + 1); });
+            presClose.addEventListener('click', closePresentation);
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) closePresentation(); });
+            document.addEventListener('keydown', (e) => { if (!overlay.classList.contains('open')) return; if (e.key === 'Escape') closePresentation(); if (e.key === 'ArrowRight') goToSlide(currentSlide + 1); if (e.key === 'ArrowLeft') goToSlide(currentSlide - 1); });
+            window.openPresentation = openPresentation;
+
+            // ═══════════ VERBALI ═══════════
+            const STORAGE_KEY = 'cleaningboat_verbali';
+            let verbaliDB = [];
+            function loadVerbali() { try { verbaliDB = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e) { verbaliDB = []; } }
+            function saveVerbali() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(verbaliDB)); } catch(e) {} }
+            loadVerbali();
+            const sidebarVerbaliList = document.getElementById('sidebarVerbaliList');
+            const sidebarCount = document.getElementById('sidebarCount');
+            function renderSidebar() {
+                if (!sidebarVerbaliList) return;
+                sidebarVerbaliList.innerHTML = verbaliDB.length === 0 ? '<div class="sidebar-empty">📭 Nessun verbale.</div>' : '';
+                verbaliDB.forEach((v, i) => {
+                    const item = document.createElement('div'); item.className = 'sidebar-verbale-item';
+                    item.innerHTML = `<div class="sidebar-verbale-info"><div class="sidebar-verbale-date">📅 ${v.date||'Data sconosciuta'}</div><div class="sidebar-verbale-title">${v.title||'Senza titolo'}</div></div><button class="sidebar-verbale-delete">🗑️</button>`;
+                    item.querySelector('.sidebar-verbale-info').addEventListener('click', () => selectVerbale(i));
+                    item.querySelector('.sidebar-verbale-delete').addEventListener('click', (e) => { e.stopPropagation(); if(confirm('Eliminare?')){verbaliDB.splice(i,1);saveVerbali();renderSidebar();document.getElementById('emptyState').style.display='block';document.getElementById('verbaleContent').style.display='none';} });
+                    sidebarVerbaliList.appendChild(item);
+                });
+                if(sidebarCount) sidebarCount.textContent = verbaliDB.length === 0 ? 'Nessun verbale' : `${verbaliDB.length} verbale${verbaliDB.length!==1?'i':''}`;
+            }
+            renderSidebar();
+            document.getElementById('sidebarUploadBtn')?.addEventListener('click', () => document.getElementById('sidebarUploadInput').click());
+            document.getElementById('sidebarUploadInput')?.addEventListener('change', function() {
+                Array.from(this.files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) { verbaliDB.unshift({ id: 'v'+Date.now(), date: new Date().toLocaleDateString('it-IT'), title: file.name.replace(/\.(pdf|docx|md|txt)$/i,''), tipo:'File caricato', content: e.target.result }); saveVerbali(); renderSidebar(); selectVerbale(0); };
+                    reader.readAsText(file);
+                });
+                this.value = '';
+            });
+            function selectVerbale(index) {
+                const v = verbaliDB[index]; if(!v) return;
+                document.querySelectorAll('.sidebar-verbale-item').forEach((item,i) => item.classList.toggle('active', i===index));
+                document.getElementById('emptyState').style.display = 'none'; document.getElementById('verbaleContent').style.display = 'block';
+                document.getElementById('verbaleFileInfo').innerHTML = `<span>📂</span><span><strong>${v.title}</strong> · ${v.date}</span>`;
+                const d = parseVerbale(v.content);
+                document.getElementById('field-data').textContent = d.date||v.date||'—'; document.getElementById('field-luogo').textContent = d.luogo||'—';
+                document.getElementById('field-durata').textContent = d.durata||'—'; document.getElementById('field-presenti').textContent = d.presenti.length>0?d.presenti.join(', '):'—';
+                document.getElementById('field-tipologia').textContent = d.tipologia||v.tipo||'—';
+                document.getElementById('field-attivita').innerHTML = d.attivita.length>0?d.attivita.map(a=>`<div class="vf"><div class="vf-v">📌 ${a}</div></div>`).join(''):'<div style="color:var(--text2);">Nessuna attività</div>';
+                document.getElementById('field-problemi').innerHTML = d.problemi.length>0?d.problemi.map(p=>`<div class="issue-row"><div class="issue-dot">🔴</div><div>${p}</div></div>`).join(''):'<div style="color:var(--text2);">Nessun problema</div>';
+                document.getElementById('field-decisioni').innerHTML = d.decisioni.length>0?d.decisioni.map(dc=>`<div class="triz-p">${dc}</div>`).join(''):'<div style="color:var(--text2);">Nessuna decisione</div>';
+                if(d.oreMembri.length>0){const mx=Math.max(...d.oreMembri.map(m=>m.ore),10);document.getElementById('field-ore').innerHTML=d.oreMembri.map(m=>`<div class="ore-row"><span class="ore-name">${m.nome}</span><span class="ore-bw"><span class="ore-bf" style="width:${(m.ore/mx)*100}%"></span></span><span class="ore-v">${m.ore}h</span></div>`).join('');}else document.getElementById('field-ore').innerHTML='<div style="color:var(--text2);">Nessuna ora</div>';
+                document.getElementById('field-passi').innerHTML = d.prossimiPassi.length>0?d.prossimiPassi.map(p=>`<div class="vtask"><div class="vtask-cb"></div><span class="vtask-label">${p.testo}</span>${p.who?`<span class="vtask-who">${p.who}</span>`:''}${p.date?`<span class="vtask-date">${p.date}</span>`:''}</div>`).join(''):'<div style="color:var(--text2);">Nessun passo</div>';
+            }
+            function parseVerbale(c) {
+                const d={date:'',luogo:'',durata:'',presenti:[],tipologia:'',attivita:[],problemi:[],decisioni:[],oreMembri:[],prossimiPassi:[]};
+                const dm=c.match(/Data[:\s]*(\d{1,2}\s*(?:gen|feb|mar|apr|mag|giu|lug|ago|set|ott|nov|dic)\w*\s*\d{4})/i)||c.match(/Data[:\s]*(\d{1,2}[\/\-.]\d{1,2}[\/\-.]\d{2,4})/i);if(dm)d.date=dm[1].trim();
+                const lm=c.match(/Luogo[:\s]*([^\n]+)/i);if(lm)d.luogo=lm[1].trim();
+                const dm2=c.match(/Durata[:\s]*([^\n]+)/i);if(dm2)d.durata=dm2[1].trim();
+                const pm=c.match(/Presenti[:\s]*([^\n]+)/i);if(pm)d.presenti=pm[1].split(/[,;]/).map(p=>p.trim()).filter(p=>p);
+                const tm=c.match(/Tipologia[:\s]*([^\n]+)/i);if(tm)d.tipologia=tm[1].trim();
+                const as=c.match(/Attivit[àa][:\s]*(?:Svolte[:\s]*)?([\s\S]*?)(?=Problemi|Decisioni|Ore|Prossimi|$)/i);if(as)d.attivita=as[1].split('\n').map(l=>l.replace(/^[\s\-\•\*\d\.\#]+/,'').trim()).filter(l=>l.length>3);
+                const ps=c.match(/Problemi[:\s]*(?:Riscontrati[:\s]*)?([\s\S]*?)(?=Decisioni|Ore|Prossimi|$)/i);if(ps)d.problemi=ps[1].split('\n').map(l=>l.replace(/^[\s\-\•\*\d\.\#]+/,'').trim()).filter(l=>l.length>3);
+                const ds=c.match(/Decisioni[:\s]*(?:Prese[:\s]*)?([\s\S]*?)(?=Ore|Prossimi|$)/i);if(ds)d.decisioni=ds[1].split('\n').map(l=>l.replace(/^[\s\-\•\*\d\.\#]+/,'').trim()).filter(l=>l.length>3);
+                const os=c.match(/Ore[:\s]*(?:Lavorate[:\s]*)?(?:per Membro[:\s]*)?([\s\S]*?)(?=Prossimi|$)/i);if(os){const ms=os[1].matchAll(/([A-Za-zÀ-ÿ\s\.]+?)[:\s]+(\d+[\.\,]?\d*)\s*(?:h|ore)?/gi);for(const m of ms){const n=m[1].trim();const o=parseFloat(m[2].replace(',','.'));if(n.length>1&&o>0)d.oreMembri.push({nome:n,ore:o});}}
+                const pss=c.match(/Prossimi[:\s]*(?:Passi[:\s]*)?([\s\S]*?)$/i);if(pss)d.prossimiPassi=pss[1].split('\n').map(l=>l.replace(/^[\s\-\•\*\d\.\#]+/,'').trim()).filter(l=>l.length>3).map(p=>{const w=p.match(/(?:assegnato a|responsabile)[:\s]*([A-Za-zÀ-ÿ\s]+)/i);const dd=p.match(/(?:entro|scadenza)[:\s]*(\d{1,2}[\/\-.]?\d{1,2}[\/\-.]?\d{2,4})/i);return{testo:p,who:w?w[1].trim():'',date:dd?dd[1].trim():''};});
+                return d;
+            }
+
+            // ═══════════ DATA POPULATION ═══════════
+            const team=[{abbr:'PM',name:'Luchini Alessandro',role:'Referente: IA, BOM, Schema Elettrico, Labeling',c:'#00d4ff'},{abbr:'HW/SW',name:'Genzini Lorenzo',role:'HW Lead: CAD, Sito, IA, BOM, Labeling',c:'#00ff88'},{abbr:'SW',name:'Bogdan Matteo',role:'Software: Librerie, Arduino, Training ML',c:'#00ff88'},{abbr:'DOC',name:'Ayad Chakib',role:'Documentazione: Verbali, Labeling',c:'#ffaa00'},{abbr:'SW',name:'Gianoglio Giovanni',role:'Software: Arduino, ML, Stampa 3D, IA',c:'#00ff88'},{abbr:'DOC/SW',name:'Fionda Gianluca',role:'Doc/Software: IA, Labeling, Training',c:'#ffaa00'}];
+            const tg=document.getElementById('f0-team');if(tg)team.forEach(t=>{const e=document.createElement('div');e.className='team-card';e.innerHTML=`<span class="team-abbr" style="color:${t.c};background:${t.c}15;border:1px solid ${t.c}40">${t.abbr}</span><div class="team-name">${t.name}</div><div class="team-role">${t.role}</div>`;tg.appendChild(e);});
+            const tools=[{icon:'🐙',cat:'Repository',catC:'#00d4ff',name:'GitHub',desc:'Versionamento'},{icon:'📋',cat:'Task Board',catC:'#00ff88',name:'Notion',desc:'Kanban'},{icon:'📁',cat:'Documenti',catC:'#ffaa00',name:'Google Drive',desc:'File condivisi'}];
+            const tg2=document.getElementById('f0-tools');if(tg2)tools.forEach(t=>{const e=document.createElement('div');e.className='tool-card';e.innerHTML=`<div class="tool-icon">${t.icon}</div><div><span class="tool-cat" style="background:${t.catC}15;color:${t.catC};">${t.cat}</span><div class="tool-name">${t.name}</div><div class="tool-desc">${t.desc}</div></div>`;tg2.appendChild(e);});
+            const docs=[{icon:'📋',title:'Verbale di sessione',sub:'Fine sessione',body:'Data, presenti, attività, problemi.'},{icon:'📊',title:'Gantt',sub:'Aggiornare',body:'Stato reale del progetto.'},{icon:'📄',title:'Documentazione tecnica',sub:'Replicabile',body:'README, schema, BOM.'}];
+            const dg=document.getElementById('f0-docs');if(dg)docs.forEach(d=>{const e=document.createElement('div');e.className='card card-orange';e.innerHTML=`<div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;"><div>${d.icon}</div><div><div style="font-family:var(--ff-display);font-weight:700;">${d.title}</div><div style="font-size:.72rem;color:var(--text2)">${d.sub}</div></div></div><div style="font-size:.82rem;color:var(--text2);">${d.body}</div>`;dg.appendChild(e);});
+            [{v:'~60h',l:'Ore Totali'},{v:'~40h',l:'Maggio'},{v:'~20h',l:'Giugno'},{v:'5',l:'Milestone'},{v:"15'",l:'Presentazione'}].forEach(s=>{const e=document.createElement('div');e.className='stat-box';e.innerHTML=`<div class="stat-v">${s.v}</div><div class="stat-l">${s.l}</div>`;document.getElementById('f1-stats')?.appendChild(e);});
+            const gr=[{label:'Pianificazione',wks:[1,0,0,0,0],color:'#00ff88'},{label:'Specifiche + BOM',wks:[0,1,0,0,0],color:'#00ff88'},{label:'Setup Hardware',wks:[0,0,1,0,0],color:'#00d4ff'},{label:'Raccolta dataset',wks:[0,0,1,1,0],color:'#00d4ff'},{label:'Training ML',wks:[0,0,0,1,0],color:'#ffaa00'},{label:'Integrazione',wks:[0,0,0,1,0],color:'#ffaa00'},{label:'Collaudo',wks:[0,0,0,0,1],color:'#ff4466'},{label:'Documentazione',wks:[0,0,0,0,1],color:'#ff4466'}];
+            const gb=document.getElementById('f1-gantt');if(gb)gr.forEach(r=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${r.label}</td>`+r.wks.map(a=>`<td style="text-align:center">${a?`<span class="gantt-bar" style="width:80%;background:${r.color};"></span>`:''}</td>`).join('');gb.appendChild(tr);});
+            const ms=[{date:'14 maggio',title:'Presentazione piano',badge:'URGENTE',bc:'#ff4466'},{date:'21 maggio',title:'Specifiche + BOM',badge:'PROSSIMA',bc:'#ffaa00'},{date:'26-30 mag',title:'Setup HW',badge:'DEV',bc:'#00ff88'},{date:'2-6 giugno',title:'Training',badge:'ML',bc:'#00d4ff'},{date:'9-12 giugno',title:'Collaudo finale',badge:'FINALE',bc:'#00ff88'}];
+            const ml=document.getElementById('f1-ms');if(ml)ms.forEach(m=>{const e=document.createElement('div');e.className='ms-item';e.innerHTML=`<div class="ms-date">${m.date}</div><div><div class="ms-title">${m.title}</div></div><span class="ms-badge" style="color:${m.bc};border-color:${m.bc};">${m.badge}</span>`;ml.appendChild(e);});
+            const slides=[{t:"0-2'",title:'Team',desc:'Nomi, ruoli'},{t:"2-4'",title:'Problema',desc:'AI e rifiuti'},{t:"4-7'",title:'Obiettivi',desc:'Firmware, ML, 3D'},{t:"7-10'",title:'Gantt',desc:'Timeline'},{t:"10-12'",title:'Metodologia',desc:'TRIZ'},{t:"12-14'",title:'Rischi',desc:'Mitigazioni'},{t:"14-15'",title:'Q&A',desc:'Domande'}];
+            const sl=document.getElementById('f1-slides');if(sl)slides.forEach((s,i)=>{const e=document.createElement('div');e.className='slide-row';e.innerHTML=`<div class="slide-time">${s.t}</div><div class="slide-line"></div><div><div class="slide-title">${i+1}. ${s.title}</div><div class="slide-desc">${s.desc}</div></div>`;sl.appendChild(e);});
+            const rf=[{id:'RF01',req:'Riconoscere 6 categorie',p:'Alta'},{id:'RH06',req:'Latenza ≤2s',p:'Media'},{id:'RF04',req:'UART con P4',p:'Alta'},{id:'RF01',req:'Accuratezza ≥80%',p:'Alta'}];
+            const rh=[{id:'RH01',req:'Flash ≥256KB',p:'Alta'},{id:'RH02',req:'Camera 8 MP',p:'Alta'},{id:'RH03',req:'Powerbank 5V',p:'Alta'},{id:'RH06',req:'Anti-schizzi',p:'Media'}];
+            function rs(d,id){const tb=document.getElementById(id);if(!tb)return;d.forEach(r=>{const tr=document.createElement('tr');tr.innerHTML=`<td class="spec-id">${r.id}</td><td>${r.req}</td><td><span class="badge ${r.p==='Alta'?'b-high':'b-med'}">${r.p}</span></td>`;tb.appendChild(tr);});}
+            rs(rf,'sp-rf');rs(rh,'sp-rh');
+            const cls=[{name:'Bottiglia',icon:'🍶',c:'#00d4ff'},{name:'Lattina',icon:'🥫',c:'#00ff88'},{name:'Busta',icon:'🛍️',c:'#ffaa00'},{name:'Bicchiere',icon:'🥃',c:'#ff4466'},{name:'Tappo',icon:'🫙',c:'#b44dff'},{name:'Cartaccia',icon:'🍬',c:'#ffaa00'}];
+            const cg=document.getElementById('sp-classi');if(cg)cls.forEach(c=>{const e=document.createElement('div');e.className='ml-card';e.style.borderTopColor=c.c;e.innerHTML=`<div class="ml-icon">${c.icon}</div><div class="ml-name" style="color:${c.c}">${c.name}</div>`;cg.appendChild(e);});
+            const bom=[{n:1,name:'Arduino Uno Q',qty:2,uso:'Board ML',cat:'ML',catL:'ML/CPU'},{n:2,name:'Camera ELP USB',qty:1,uso:'Immagini',cat:'HW',catL:'Hardware'},{n:3,name:'Powerbank 5V',qty:1,uso:'Alimentazione',cat:'POWER',catL:'Alimentazione'},{n:4,name:'Fili jumper',qty:3,uso:'UART',cat:'HW',catL:'Hardware'},{n:5,name:'PLA',qty:1,uso:'Stampa 3D',cat:'MECH',catL:'Meccanica'},{n:6,name:'Vernice',qty:1,uso:'Impermeabilizzare',cat:'MECH',catL:'Meccanica'}];
+            const cc={ML:{bg:'rgba(0,212,255,.1)',txt:'#00d4ff'},HW:{bg:'rgba(0,255,136,.1)',txt:'#00ff88'},POWER:{bg:'rgba(255,170,0,.1)',txt:'#ffaa00'},MECH:{bg:'rgba(255,68,102,.1)',txt:'#ff4466'}};
+            [{v:bom.length,l:'Componenti'},{v:'6',l:'Attrezzature'},{v:'~100g',l:'PLA'}].forEach(s=>{const e=document.createElement('div');e.className='stat-box';e.innerHTML=`<div class="stat-v">${s.v}</div><div class="stat-l">${s.l}</div>`;document.getElementById('bom-stats')?.appendChild(e);});
+            function rb(f){const tb=document.getElementById('bom-tbody');if(!tb)return;tb.innerHTML='';(f==='ALL'?bom:bom.filter(r=>r.cat===f)).forEach(r=>{const c=cc[r.cat]||{bg:'rgba(255,255,255,.03)',txt:'#a0a0b8'};const tr=document.createElement('tr');tr.innerHTML=`<td>${String(r.n).padStart(2,'0')}</td><td>${r.name}</td><td><span class="qty-pill">${r.qty}</span></td><td>${r.uso}</td><td><span class="badge" style="background:${c.bg};color:${c.txt};">${r.catL}</span></td>`;tb.appendChild(tr);});}
+            function bf(){const cont=document.getElementById('bom-filters');if(!cont)return;[{k:'ALL',l:'Tutti'},{k:'ML',l:'ML/CPU'},{k:'HW',l:'Hardware'},{k:'POWER',l:'Alimentazione'},{k:'MECH',l:'Meccanica'}].forEach(c=>{const btn=document.createElement('button');btn.className='filter-btn'+(c.k==='ALL'?' active':'');btn.textContent=c.l;btn.addEventListener('click',()=>{document.querySelectorAll('#bom-filters .filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');rb(c.k);});cont.appendChild(btn);});rb('ALL');}
+            bf();
+            const attrs=[{icon:'🖨️',name:'Stampante 3D',desc:'Supporto camera',badge:'LAB',bc:'#00ff88'},{icon:'💻',name:'PC + Edge Impulse',desc:'Training',badge:'DEV',bc:'#00d4ff'},{icon:'📐',name:'NX Siemens',desc:'Disegno CAD',badge:'DEV',bc:'#00d4ff'},{icon:'🛠️',name:'Attrezzi vari',desc:'Calibro, Lime, Trapano, Cacciaviti',badge:'ATT',bc:'#8f00ff'}];
+            const ag=document.getElementById('bom-attr');if(ag)attrs.forEach(a=>{const e=document.createElement('div');e.className='attr-card';e.innerHTML=`<div class="attr-icon">${a.icon}</div><div class="attr-name">${a.name}</div><div class="attr-desc">${a.desc}</div><span class="attr-badge" style="color:${a.bc};border-color:${a.bc};">${a.badge}</span>`;ag.appendChild(e);});
+            const tc=[{num:'01',title:'Accuratezza vs Latenza',sub:'Precisione ML ≤2s.'},{num:'02',title:'Robustezza vs Peso',sub:'Condizioni variabili su MCU.'}];
+            const trg=document.getElementById('triz-contr');if(trg)tc.forEach(t=>{const e=document.createElement('div');e.className='triz-card';e.innerHTML=`<div class="triz-num">${t.num}</div><div class="triz-title">${t.title}</div><div class="triz-sub">${t.sub}</div>`;trg.appendChild(e);});
+            const mr=[{contr:'Accuratezza vs Latenza',migliorato:'Precisione',peggiorato:'Velocità',principi:'10,24,35'},{contr:'Robustezza vs Peso',migliorato:'Adattabilità',peggiorato:'Complessità',principi:'15,29,37'}];
+            const mxg=document.getElementById('triz-matrix-rows');if(mxg)mr.forEach(r=>{const row=document.createElement('div');row.className='triz-mrow';row.innerHTML=`<div class="triz-mcell"><strong>${r.contr}</strong></div><div class="triz-mcell">${r.migliorato}</div><div class="triz-mcell">${r.peggiorato}</div><div class="triz-mcell"><span class="triz-tag">${r.principi}</span></div>`;mxg.appendChild(row);});
+
+            // ═══════════ RISCHI ═══════════
+            const rischiTecnici=[{level:'high',title:'Mancata comunicazione UART con Progetto 4',mit:'Test incrociato con analizzatore logico entro il 23/5. Verificare GND comune e baud rate.'},{level:'high',title:'Accuratezza modello ML < 80%',mit:'Raccogliere 500+ immagini in condizioni variabili. Applicare data augmentation spinta.'},{level:'med',title:'Latenza eccessiva (>2 secondi)',mit:'Ottimizzare MobileNetV1 a 96×96 grayscale. Usare quantizzazione INT8.'},{level:'med',title:'Overfitting del modello ML',mit:'Data augmentation aggressiva. Suddividere dataset in training/validation/test.'},{level:'med',title:'Dataset sbilanciato',mit:'Minimo 80-100 immagini per classe. Oversampling classi minoritarie.'},{level:'med',title:'Guasto hardware',mit:'Scheda Arduino di riserva. Testare camera prima del collaudo.'},{level:'low',title:'Problemi di alimentazione',mit:'Testare autonomia powerbank. Usare ≥5000mAh.'},{level:'med',title:'Surriscaldamento componenti',mit:'Fori di ventilazione con membrana traspirante.'},{level:'med',title:'Perdita di impermeabilità',mit:'Vernice acrilica + silicone sigillante. Test in vasca.'}];
+            const rischiOrganizzativi=[{level:'high',title:'Ritardo nelle consegne (milestone)',mit:'Gantt aggiornato settimanalmente. Buffer di 2-3 giorni.'},{level:'med',title:'Assenza di un membro del team',mit:'Documentare tutto. Backup designato per ogni ruolo.'},{level:'med',title:'Mancanza di comunicazione interna',mit:'Verbali dopo ogni sessione. GitHub Projects.'},{level:'med',title:'Sovraccarico di lavoro',mit:'Monitorare ore effettive. Ridistribuire compiti.'},{level:'low',title:'Conflitti interni al team',mit:'Ruoli chiari. Decisioni a maggioranza con PM.'}];
+            const rischiEsterni=[{level:'med',title:'Condizioni meteo avverse',mit:'Data di backup. Test in vasca indoor.'},{level:'med',title:'Luce solare acceca la camera',mit:'Immagini con controluce nel dataset. Paraluce 3D.'},{level:'med',title:'Onde/schizzi danneggiano elettronica',mit:'Test in vasca con onde simulate. Doppia protezione.'},{level:'low',title:'Rifiuti non previsti',mit:'Classe "Altro". Soglia di confidenza minima.'},{level:'low',title:'Perdita del prototipo',mit:'Fissaggio sicuro. Test di galleggiamento.'}];
+            function renderRischi(titolo,rischi){const c=document.getElementById('rischi-list');if(!c)return;const d=document.createElement('div');d.innerHTML=`<div class="slabel">${titolo}</div>`;rischi.forEach(r=>{let l='',i='';if(r.level==='high'){i='🔴';}else if(r.level==='med'){l='med';i='🟡';}else{l='low';i='🟢';}const card=document.createElement('div');card.className=`risk-card ${l}`;card.innerHTML=`<div class="risk-hd"><span>${i}</span><span class="risk-title">${r.title}</span></div><div class="risk-mit">➤ ${r.mit}</div>`;d.appendChild(card);});c.appendChild(d);}
+            const rkg=document.getElementById('rischi-list');if(rkg){rkg.innerHTML='';renderRischi('🔧 Rischi Tecnici (Hardware & Software)',rischiTecnici);renderRischi('👥 Rischi Organizzativi e di Team',rischiOrganizzativi);renderRischi('🌍 Rischi Esterni e Ambientali',rischiEsterni);}
+
+            buildAllSlides();
+        })();
+    </script>
+</body>
+</html>
