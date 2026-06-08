@@ -765,7 +765,7 @@
                 uploadInput.type = 'file';
                 uploadInput.id = 'sidebarUploadInput';
                 uploadInput.className = 'sidebar-upload-input';
-                uploadInput.accept = '.pdf,.docx,.md,.txt';
+                uploadInput.accept = '.txt,.md';
                 uploadInput.multiple = false;
                 uploadInput.onchange = function(e) { handleFileUpload(e); };
                 sidebarHeader.appendChild(uploadInput);
@@ -781,7 +781,7 @@
                     const newVerbale = {
                         id: 'v' + Date.now(),
                         date: new Date().toLocaleDateString('it-IT'),
-                        title: file.name.replace(/\.(pdf|docx|md|txt)$/i, ''),
+                        title: file.name.replace(/\.(txt|md)$/i, ''),
                         tipo: 'File caricato',
                         content: content,
                         uploadedBy: 'admin'
@@ -1051,8 +1051,66 @@
             // ═══════════ VERBALI ═══════════
             const STORAGE_KEY = 'cleaningboat_verbali';
             let verbaliDB = [];
-            function loadVerbali() { try { verbaliDB = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e) { verbaliDB = []; } }
-            function saveVerbali() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(verbaliDB)); } catch(e) {} }
+            function loadVerbali() { 
+                try { 
+                    const stored = localStorage.getItem(STORAGE_KEY);
+                    if (stored) {
+                        verbaliDB = JSON.parse(stored);
+                    } else {
+                        // Verifica se ci sono verbali di esempio
+                        const exampleVerbale = `Data: 20 Maggio 2025
+Luogo: Laboratorio ITS
+Durata: 3 ore
+Presenti: Luchini A., Genzini L., Bogdan M., Ayad C., Gianoglio G., Fionda G.
+Tipologia: Sessione di sviluppo
+
+Attività Svolte:
+- Setup iniziale hardware Arduino Uno Q e camera
+- Test comunicazione seriale
+- Raccolta prime 50 immagini del dataset
+- Configurazione Edge Impulse
+
+Problemi Riscontrati:
+- La camera non veniva rilevata all'avvio (risolto riavviando)
+- Overheating del powerbank dopo 2 ore
+
+Decisioni Prese:
+- Utilizzare powerbank da 10000mAh
+- Alternare periodi di lavoro con pause
+
+Ore per Membro:
+Luchini A.: 3h
+Genzini L.: 3h
+Bogdan M.: 3h
+Ayad C.: 3h
+Gianoglio G.: 3h
+Fionda G.: 3h
+
+Prossimi Passi (assegnato a / entro):
+- Completare raccolta 500 immagini (Luchini / 30 maggio)
+- Addestrare primo modello su Edge Impulse (Bogdan / 2 giugno)
+- Progettare supporto CAD 3D (Genzini / 28 maggio)`;
+                        
+                        verbaliDB = [{
+                            id: 'v_example',
+                            date: '20 Maggio 2025',
+                            title: 'Verbale Sessione 1 - Setup Iniziale',
+                            tipo: 'Sessione di sviluppo',
+                            content: exampleVerbale,
+                            uploadedBy: 'system'
+                        }];
+                        saveVerbali();
+                    }
+                } catch(e) { 
+                    console.error(e);
+                    verbaliDB = []; 
+                } 
+            }
+            function saveVerbali() { 
+                try { 
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(verbaliDB)); 
+                } catch(e) {} 
+            }
             loadVerbali();
             const sidebarVerbaliList = document.getElementById('sidebarVerbaliList');
             const sidebarCount = document.getElementById('sidebarCount');
@@ -1060,7 +1118,8 @@
                 if (!sidebarVerbaliList) return;
                 sidebarVerbaliList.innerHTML = verbaliDB.length === 0 ? '<div class="sidebar-empty">📭 Nessun verbale.</div>' : '';
                 verbaliDB.forEach((v, i) => {
-                    const item = document.createElement('div'); item.className = 'sidebar-verbale-item';
+                    const item = document.createElement('div'); 
+                    item.className = 'sidebar-verbale-item';
                     item.innerHTML = `<div class="sidebar-verbale-info"><div class="sidebar-verbale-date">📅 ${v.date||'Data sconosciuta'}</div><div class="sidebar-verbale-title">${v.title||'Senza titolo'}</div></div>${isAdmin ? '<button class="sidebar-verbale-delete">🗑️</button>' : ''}`;
                     item.querySelector('.sidebar-verbale-info').addEventListener('click', () => selectVerbale(i));
                     const deleteBtn = item.querySelector('.sidebar-verbale-delete');
@@ -1076,11 +1135,14 @@
             function selectVerbale(index) {
                 const v = verbaliDB[index]; if(!v) return;
                 document.querySelectorAll('.sidebar-verbale-item').forEach((item,i) => item.classList.toggle('active', i===index));
-                document.getElementById('emptyState').style.display = 'none'; document.getElementById('verbaleContent').style.display = 'block';
+                document.getElementById('emptyState').style.display = 'none'; 
+                document.getElementById('verbaleContent').style.display = 'block';
                 document.getElementById('verbaleFileInfo').innerHTML = `<span>📂</span><span><strong>${v.title}</strong> · ${v.date}</span>`;
                 const d = parseVerbale(v.content);
-                document.getElementById('field-data').textContent = d.date||v.date||'—'; document.getElementById('field-luogo').textContent = d.luogo||'—';
-                document.getElementById('field-durata').textContent = d.durata||'—'; document.getElementById('field-presenti').textContent = d.presenti.length>0?d.presenti.join(', '):'—';
+                document.getElementById('field-data').textContent = d.date||v.date||'—'; 
+                document.getElementById('field-luogo').textContent = d.luogo||'—';
+                document.getElementById('field-durata').textContent = d.durata||'—'; 
+                document.getElementById('field-presenti').textContent = d.presenti.length>0?d.presenti.join(', '):'—';
                 document.getElementById('field-tipologia').textContent = d.tipologia||v.tipo||'—';
                 document.getElementById('field-attivita').innerHTML = d.attivita.length>0?d.attivita.map(a=>`<div class="vf"><div class="vf-v">📌 ${a}</div></div>`).join(''):'<div style="color:var(--text2);">Nessuna attività</div>';
                 document.getElementById('field-problemi').innerHTML = d.problemi.length>0?d.problemi.map(p=>`<div class="issue-row"><div class="issue-dot">🔴</div><div>${p}</div></div>`).join(''):'<div style="color:var(--text2);">Nessun problema</div>';
