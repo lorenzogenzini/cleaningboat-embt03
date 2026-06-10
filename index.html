@@ -290,8 +290,10 @@
         .pres-arrow:disabled { opacity:0.3; cursor:default; }
         .pres-timeline { position:absolute; bottom:0; left:0; width:100%; height:3px; background:var(--border); z-index:5; }
         .pres-timeline-fill { height:100%; background:var(--accent); transition:width 0.5s ease; border-radius:0 2px 2px 0; }
+        
+        /* NUOVO LAYOUT VERBALI CON 10 POSTI */
         .verbale-layout { display:flex; min-height:calc(100vh - 75px); }
-        .verbale-sidebar { width:300px; min-width:300px; background:rgba(18,18,26,0.7); border-right:1px solid var(--border); backdrop-filter:blur(15px); display:flex; flex-direction:column; height:calc(100vh - 75px); position:sticky; top:75px; overflow-y:auto; z-index:10; }
+        .verbale-sidebar { width:350px; min-width:350px; background:rgba(18,18,26,0.7); border-right:1px solid var(--border); backdrop-filter:blur(15px); display:flex; flex-direction:column; height:calc(100vh - 75px); position:sticky; top:75px; overflow-y:auto; z-index:10; }
         .sidebar-header { padding:1.2rem; border-bottom:1px solid var(--border); position:sticky; top:0; background:rgba(18,18,26,0.95); backdrop-filter:blur(15px); z-index:2; }
         .sidebar-title { font-family:var(--ff-display); font-size:0.9rem; font-weight:700; }
         .sidebar-subtitle { font-size:0.65rem; color:var(--text2); }
@@ -302,6 +304,7 @@
         .sidebar-verbale-item { padding:0.85rem; margin:0.25rem 0; border:1px solid var(--border); border-radius:var(--radius-sm); cursor:pointer; transition:all var(--transition); background:rgba(18,18,26,0.4); display:flex; justify-content:space-between; align-items:flex-start; position:relative; }
         .sidebar-verbale-item:hover { border-color:var(--accent); background:rgba(0,212,255,0.05); }
         .sidebar-verbale-item.active { border-color:var(--purple); background:rgba(180,77,255,0.1); }
+        .sidebar-verbale-item.editable { border-color:var(--green); background:rgba(0,255,136,0.05); }
         .sidebar-verbale-info { flex:1; }
         .sidebar-verbale-date { font-family:var(--ff-mono); font-size:0.55rem; color:var(--accent); }
         .sidebar-verbale-title { font-family:var(--ff-display); font-size:0.75rem; font-weight:600; }
@@ -310,9 +313,12 @@
         .sidebar-verbale-delete:hover { color:var(--red); background:rgba(255,68,102,0.1); }
         .sidebar-empty { text-align:center; padding:2rem 1rem; color:var(--text2); font-style:italic; font-size:0.75rem; }
         .sidebar-footer { padding:0.6rem 0.85rem; border-top:1px solid var(--border); font-size:0.58rem; color:var(--text2); text-align:center; }
+        
+        /* VERBALE MAIN - MODIFICA E VISUALIZZAZIONE */
         .verbale-main { flex:1; padding:1.5rem 2rem; overflow-y:auto; height:calc(100vh - 75px); }
         .verbale-block { border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:0.85rem; background:rgba(18,18,26,0.5); }
-        .verbale-block.ai-updated { border-color:var(--purple)!important; box-shadow:0 0 15px rgba(180,77,255,0.2)!important; }
+        .verbale-block.editable { border-color:var(--green); }
+        .verbale-block.editing { border-color:var(--accent); box-shadow:0 0 15px rgba(0,212,255,0.2); }
         .verbale-hd { display:flex; align-items:center; gap:0.4rem; padding:0.6rem 1rem; background:rgba(0,0,0,0.3); border-bottom:1px solid var(--border); }
         .verbale-hd-icon { font-size:0.75rem; }
         .verbale-hd-title { font-family:var(--ff-display); font-size:0.7rem; font-weight:700; color:var(--accent); }
@@ -320,6 +326,8 @@
         .vf { margin-bottom:0.7rem; }
         .vf-l { font-family:var(--ff-mono); font-size:0.55rem; color:var(--accent); text-transform:uppercase; }
         .vf-v { font-size:0.76rem; }
+        .vf-input { width:100%; padding:0.5rem; background:rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:6px; color:var(--text); font-family:var(--ff-body); font-size:0.76rem; }
+        .vf-textarea { width:100%; padding:0.5rem; background:rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:6px; color:var(--text); font-family:var(--ff-body); font-size:0.76rem; min-height:80px; resize:vertical; }
         .vtask { display:flex; align-items:flex-start; gap:0.5rem; padding:0.4rem 0; border-bottom:1px solid var(--border); font-size:0.74rem; }
         .vtask:last-child{border-bottom:none}
         .vtask-cb { width:13px; height:13px; border:2px solid var(--border); border-radius:3px; flex-shrink:0; margin-top:2px; display:flex; align-items:center; justify-content:center; }
@@ -336,10 +344,16 @@
         .empty-state { text-align:center; padding:3rem 1rem; color:var(--text2); }
         .empty-state-icon { font-size:2.5rem; margin-bottom:0.75rem; }
         .empty-state-text { font-style:italic; }
-        .sidebar-admin-area { padding:0.75rem; border-top:1px solid var(--border); border-bottom:1px solid var(--border); background:rgba(0,212,255,0.05); }
+        
+        /* ADMIN AREA */
+        .sidebar-admin-area { padding:0.75rem; border-top:1px solid var(--border); border-bottom:1px solid var(--border); background:rgba(0,212,255,0.05); display:flex; flex-direction:column; gap:0.5rem; }
         .admin-btn { width:100%; padding:0.5rem; background:rgba(180,77,255,0.2); border:1px solid var(--purple); border-radius:var(--radius-sm); color:var(--purple); font-size:0.7rem; font-weight:600; cursor:pointer; text-align:center; transition:all var(--transition); }
         .admin-btn:hover { background:rgba(180,77,255,0.4); border-color:var(--accent); color:var(--accent); }
         .admin-badge { background:var(--purple); color:#fff; padding:0.2rem 0.5rem; border-radius:4px; font-size:0.6rem; margin-left:0.5rem; }
+        .edit-save-btn { width:100%; padding:0.5rem; background:rgba(0,255,136,0.2); border:1px solid var(--green); border-radius:var(--radius-sm); color:var(--green); font-size:0.7rem; font-weight:600; cursor:pointer; text-align:center; margin-top:0.5rem; transition:all var(--transition); }
+        .edit-save-btn:hover { background:rgba(0,255,136,0.4); }
+        
+        /* LOGIN OVERLAY */
         .login-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); backdrop-filter:blur(10px); z-index:20000; display:flex; align-items:center; justify-content:center; opacity:0; visibility:hidden; transition:all var(--transition); }
         .login-overlay.active { opacity:1; visibility:visible; }
         .login-box { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:2rem; width:320px; text-align:center; box-shadow:0 0 50px rgba(180,77,255,0.3); }
@@ -641,25 +655,64 @@
             <div class="verbale-sidebar">
                 <div class="sidebar-header">
                     <div class="sidebar-title">📝 Verbali <span id="adminBadge"></span></div>
-                    <div class="sidebar-subtitle" id="sidebarCount">Nessun verbale caricato</div>
+                    <div class="sidebar-subtitle" id="sidebarCount">10 posti disponibili</div>
                 </div>
                 <div class="sidebar-admin-area" id="adminArea">
                     <button class="admin-btn" id="adminLoginBtn">🔐 Accesso Admin</button>
                 </div>
-                <div class="sidebar-verbali-list" id="sidebarVerbaliList"><div class="sidebar-empty">📭 Nessun verbale.</div></div>
-                <div class="sidebar-footer">💾 Salvati nel browser</div>
+                <div class="sidebar-verbali-list" id="sidebarVerbaliList">
+                    <!-- 10 POSTI PER VERBALI -->
+                    <div class="sidebar-empty">📭 Nessun verbale caricato. 10 posti disponibili.</div>
+                </div>
+                <div class="sidebar-footer">💾 Salvati nel browser · Max 10 verbali</div>
             </div>
             <div class="verbale-main">
                 <div class="ph-mini"><div class="ph-tag">🤖 Sistema AI</div><h1 class="ph-title" style="font-size:1.8rem;">Dettaglio Verbale</h1></div>
-                <div class="empty-state" id="emptyState"><div class="empty-state-icon">📋</div><div class="empty-state-text">Seleziona un verbale o carica un file.</div></div>
+                <div class="empty-state" id="emptyState"><div class="empty-state-icon">📋</div><div class="empty-state-text">Seleziona un verbale per visualizzarlo.<br>Se sei admin, puoi caricare nuovi file e modificarli.</div></div>
                 <div id="verbaleContent" style="display:none;">
                     <div class="alert alert-info" id="verbaleFileInfo"></div>
-                    <div class="slabel">📋 Informazioni</div><div class="verbale-block"><div class="verbale-hd"><span class="verbale-hd-icon">📋</span><span class="verbale-hd-title">Header</span></div><div class="verbale-body"><div class="g2"><div><div class="vf"><div class="vf-l">Data</div><div class="vf-v" id="field-data">—</div></div><div class="vf"><div class="vf-l">Luogo</div><div class="vf-v" id="field-luogo">—</div></div><div class="vf"><div class="vf-l">Durata</div><div class="vf-v" id="field-durata">—</div></div></div><div><div class="vf"><div class="vf-l">Presenti</div><div class="vf-v" id="field-presenti">—</div></div><div class="vf"><div class="vf-l">Tipologia</div><div class="vf-v" id="field-tipologia">—</div></div></div></div></div></div>
-                    <div class="slabel">✅ Attività</div><div class="verbale-block"><div class="verbale-hd"><span class="verbale-hd-icon">✅</span><span class="verbale-hd-title">Attività</span></div><div class="verbale-body" id="field-attivita"></div></div>
-                    <div class="slabel">🐛 Problemi</div><div class="verbale-block"><div class="verbale-hd"><span class="verbale-hd-icon">🐛</span><span class="verbale-hd-title">Problemi</span></div><div class="verbale-body" id="field-problemi"></div></div>
-                    <div class="slabel">⚖️ Decisioni</div><div class="verbale-block"><div class="verbale-hd"><span class="verbale-hd-icon">⚖️</span><span class="verbale-hd-title">Decisioni</span></div><div class="verbale-body" id="field-decisioni"></div></div>
-                    <div class="slabel">⏱️ Ore</div><div class="verbale-block"><div class="verbale-hd"><span class="verbale-hd-icon">⏱️</span><span class="verbale-hd-title">Ore</span></div><div class="verbale-body" id="field-ore"></div></div>
-                    <div class="slabel">📌 Prossimi Passi</div><div class="verbale-block"><div class="verbale-hd"><span class="verbale-hd-icon">📌</span><span class="verbale-hd-title">Prossimi Passi</span></div><div class="verbale-body" id="field-passi"></div></div>
+                    <div class="slabel">📋 Informazioni</div>
+                    <div class="verbale-block" id="block-info">
+                        <div class="verbale-hd"><span class="verbale-hd-icon">📋</span><span class="verbale-hd-title">Header</span></div>
+                        <div class="verbale-body">
+                            <div class="g2">
+                                <div>
+                                    <div class="vf"><div class="vf-l">Data</div><div class="vf-v" id="field-data">—</div></div>
+                                    <div class="vf"><div class="vf-l">Luogo</div><div class="vf-v" id="field-luogo">—</div></div>
+                                    <div class="vf"><div class="vf-l">Durata</div><div class="vf-v" id="field-durata">—</div></div>
+                                </div>
+                                <div>
+                                    <div class="vf"><div class="vf-l">Presenti</div><div class="vf-v" id="field-presenti">—</div></div>
+                                    <div class="vf"><div class="vf-l">Tipologia</div><div class="vf-v" id="field-tipologia">—</div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slabel">✅ Attività</div>
+                    <div class="verbale-block" id="block-attivita">
+                        <div class="verbale-hd"><span class="verbale-hd-icon">✅</span><span class="verbale-hd-title">Attività</span></div>
+                        <div class="verbale-body" id="field-attivita"></div>
+                    </div>
+                    <div class="slabel">🐛 Problemi</div>
+                    <div class="verbale-block" id="block-problemi">
+                        <div class="verbale-hd"><span class="verbale-hd-icon">🐛</span><span class="verbale-hd-title">Problemi</span></div>
+                        <div class="verbale-body" id="field-problemi"></div>
+                    </div>
+                    <div class="slabel">⚖️ Decisioni</div>
+                    <div class="verbale-block" id="block-decisioni">
+                        <div class="verbale-hd"><span class="verbale-hd-icon">⚖️</span><span class="verbale-hd-title">Decisioni</span></div>
+                        <div class="verbale-body" id="field-decisioni"></div>
+                    </div>
+                    <div class="slabel">⏱️ Ore</div>
+                    <div class="verbale-block" id="block-ore">
+                        <div class="verbale-hd"><span class="verbale-hd-icon">⏱️</span><span class="verbale-hd-title">Ore</span></div>
+                        <div class="verbale-body" id="field-ore"></div>
+                    </div>
+                    <div class="slabel">📌 Prossimi Passi</div>
+                    <div class="verbale-block" id="block-passi">
+                        <div class="verbale-hd"><span class="verbale-hd-icon">📌</span><span class="verbale-hd-title">Prossimi Passi</span></div>
+                        <div class="verbale-body" id="field-passi"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -669,7 +722,10 @@
         (function() {
             // ═══════════ ADMIN AUTHENTICATION ═══════════
             const ADMIN_PASSWORD = 'admin123';
+            const MAX_VERBALI = 10; // MASSIMO 10 VERBALI
             let isAdmin = false;
+            let currentVerbaleIndex = -1;
+            let isEditing = false;
             
             const loginOverlay = document.getElementById('loginOverlay');
             const adminLoginBtn = document.getElementById('adminLoginBtn');
@@ -711,6 +767,8 @@
                 if (existingUploadBtn) {
                     existingUploadBtn.style.display = isAdmin ? 'block' : 'none';
                 }
+                // Aggiorna visibilità pulsante modifica
+                updateEditButtonVisibility();
             }
             
             function showLoginModal() {
@@ -718,8 +776,7 @@
                     isAdmin = false;
                     sessionStorage.removeItem('cleaningboat_admin');
                     updateAdminUI();
-                    const uploadBtn = document.getElementById('sidebarUploadBtn');
-                    if (uploadBtn) uploadBtn.style.display = 'none';
+                    if (isEditing) toggleEditMode();
                     return;
                 }
                 loginOverlay.classList.add('active');
@@ -738,6 +795,7 @@
                     updateAdminUI();
                     closeLoginModal();
                     createUploadButtonInSidebar();
+                    if (currentVerbaleIndex >= 0) selectVerbale(currentVerbaleIndex);
                 } else {
                     loginError.style.display = 'block';
                     adminPassword.value = '';
@@ -751,14 +809,26 @@
                 let existingBtn = document.getElementById('sidebarUploadBtn');
                 if (existingBtn) {
                     existingBtn.style.display = isAdmin ? 'block' : 'none';
+                    // Aggiorna testo con contatore posti
+                    const available = MAX_VERBALI - verbaliDB.length;
+                    existingBtn.textContent = available > 0 ? `📤 Carica nuovo verbale (${available} posti)` : '⚠️ Posti esauriti';
+                    existingBtn.disabled = available <= 0;
                     return;
                 }
+                const available = MAX_VERBALI - verbaliDB.length;
                 const uploadBtn = document.createElement('button');
                 uploadBtn.id = 'sidebarUploadBtn';
                 uploadBtn.className = 'sidebar-upload-btn';
-                uploadBtn.innerHTML = '📤 Carica nuovo verbale';
+                uploadBtn.innerHTML = available > 0 ? `📤 Carica nuovo verbale (${available} posti)` : '⚠️ Posti esauriti';
                 uploadBtn.style.display = isAdmin ? 'block' : 'none';
-                uploadBtn.onclick = () => document.getElementById('sidebarUploadInput').click();
+                uploadBtn.disabled = available <= 0;
+                uploadBtn.onclick = () => {
+                    if (verbaliDB.length >= MAX_VERBALI) {
+                        alert('⚠️ Hai raggiunto il massimo di 10 verbali. Elimina un verbale esistente per caricarne uno nuovo.');
+                        return;
+                    }
+                    document.getElementById('sidebarUploadInput').click();
+                };
                 sidebarHeader.appendChild(uploadBtn);
                 
                 const uploadInput = document.createElement('input');
@@ -773,6 +843,11 @@
             
             function handleFileUpload(event) {
                 if (!isAdmin) return;
+                if (verbaliDB.length >= MAX_VERBALI) {
+                    alert('⚠️ Posti esauriti! Massimo 10 verbali.');
+                    event.target.value = '';
+                    return;
+                }
                 const file = event.target.files[0];
                 if (!file) return;
                 const reader = new FileReader();
@@ -790,25 +865,128 @@
                     saveVerbali();
                     renderSidebar();
                     selectVerbale(0);
+                    createUploadButtonInSidebar();
                 };
                 reader.readAsText(file);
                 event.target.value = '';
             }
             
+            // ═══════════ FUNZIONE TOGGLE EDIT MODE ═══════════
+            function toggleEditMode() {
+                if (!isAdmin) {
+                    alert('🔐 Devi effettuare l\'accesso come Admin per modificare i verbali.');
+                    showLoginModal();
+                    return;
+                }
+                isEditing = !isEditing;
+                const editBtn = document.getElementById('editToggleBtn');
+                if (editBtn) {
+                    editBtn.textContent = isEditing ? '💾 Salva Modifiche' : '✏️ Modifica Verbale';
+                    editBtn.style.background = isEditing ? 'rgba(0,255,136,0.3)' : 'rgba(180,77,255,0.2)';
+                    editBtn.style.borderColor = isEditing ? 'var(--green)' : 'var(--purple)';
+                    editBtn.style.color = isEditing ? 'var(--green)' : 'var(--purple)';
+                }
+                if (currentVerbaleIndex >= 0) {
+                    if (isEditing) {
+                        renderVerbaleEditable(currentVerbaleIndex);
+                    } else {
+                        // SALVA LE MODIFICHE
+                        saveEditableVerbale(currentVerbaleIndex);
+                        renderVerbaleView(currentVerbaleIndex);
+                    }
+                }
+            }
+            
+            function updateEditButtonVisibility() {
+                const editBtn = document.getElementById('editToggleBtn');
+                if (editBtn) {
+                    editBtn.style.display = (currentVerbaleIndex >= 0 && isAdmin) ? 'block' : 'none';
+                    editBtn.textContent = isEditing ? '💾 Salva Modifiche' : '✏️ Modifica Verbale';
+                }
+            }
+            
+            function renderVerbaleEditable(index) {
+                const v = verbaliDB[index];
+                if (!v) return;
+                const d = parseVerbale(v.content);
+                document.getElementById('field-data').innerHTML = `<input type="text" class="vf-input" id="edit-data" value="${d.date||v.date||''}">`;
+                document.getElementById('field-luogo').innerHTML = `<input type="text" class="vf-input" id="edit-luogo" value="${d.luogo||''}">`;
+                document.getElementById('field-durata').innerHTML = `<input type="text" class="vf-input" id="edit-durata" value="${d.durata||''}">`;
+                document.getElementById('field-presenti').innerHTML = `<input type="text" class="vf-input" id="edit-presenti" value="${d.presenti.join(', ')}">`;
+                document.getElementById('field-tipologia').innerHTML = `<input type="text" class="vf-input" id="edit-tipologia" value="${d.tipologia||v.tipo||''}">`;
+                document.getElementById('field-attivita').innerHTML = `<textarea class="vf-textarea" id="edit-attivita">${d.attivita.join('\n')}</textarea>`;
+                document.getElementById('field-problemi').innerHTML = `<textarea class="vf-textarea" id="edit-problemi">${d.problemi.join('\n')}</textarea>`;
+                document.getElementById('field-decisioni').innerHTML = `<textarea class="vf-textarea" id="edit-decisioni">${d.decisioni.join('\n')}</textarea>`;
+                
+                let oreText = '';
+                d.oreMembri.forEach(m => { oreText += `${m.nome}: ${m.ore}h\n`; });
+                document.getElementById('field-ore').innerHTML = `<textarea class="vf-textarea" id="edit-ore">${oreText}</textarea>`;
+                
+                let passiText = '';
+                d.prossimiPassi.forEach(p => { passiText += `${p.testo}${p.who?` (assegnato a: ${p.who})`:''}${p.date?` (entro: ${p.date})`:''}\n`; });
+                document.getElementById('field-passi').innerHTML = `<textarea class="vf-textarea" id="edit-passi">${passiText}</textarea>`;
+                
+                // Aggiungi classe editing ai blocchi
+                document.querySelectorAll('.verbale-block').forEach(b => b.classList.add('editable'));
+            }
+            
+            function saveEditableVerbale(index) {
+                const v = verbaliDB[index];
+                if (!v) return;
+                
+                const data = document.getElementById('edit-data')?.value || '';
+                const luogo = document.getElementById('edit-luogo')?.value || '';
+                const durata = document.getElementById('edit-durata')?.value || '';
+                const presenti = document.getElementById('edit-presenti')?.value || '';
+                const tipologia = document.getElementById('edit-tipologia')?.value || '';
+                const attivita = document.getElementById('edit-attivita')?.value || '';
+                const problemi = document.getElementById('edit-problemi')?.value || '';
+                const decisioni = document.getElementById('edit-decisioni')?.value || '';
+                const ore = document.getElementById('edit-ore')?.value || '';
+                const passi = document.getElementById('edit-passi')?.value || '';
+                
+                let newContent = `Data: ${data}\n`;
+                if (luogo) newContent += `Luogo: ${luogo}\n`;
+                if (durata) newContent += `Durata: ${durata}\n`;
+                if (presenti) newContent += `Presenti: ${presenti}\n`;
+                if (tipologia) newContent += `Tipologia: ${tipologia}\n`;
+                if (attivita.trim()) newContent += `\nAttività Svolte:\n${attivita}\n`;
+                if (problemi.trim()) newContent += `\nProblemi Riscontrati:\n${problemi}\n`;
+                if (decisioni.trim()) newContent += `\nDecisioni Prese:\n${decisioni}\n`;
+                if (ore.trim()) newContent += `\nOre per Membro:\n${ore}\n`;
+                if (passi.trim()) newContent += `\nProssimi Passi:\n${passi}\n`;
+                
+                v.content = newContent;
+                v.date = data;
+                saveVerbali();
+            }
+            
+            function renderVerbaleView(index) {
+                const v = verbaliDB[index];
+                if (!v) return;
+                const d = parseVerbale(v.content);
+                document.getElementById('field-data').textContent = d.date||v.date||'—';
+                document.getElementById('field-luogo').textContent = d.luogo||'—';
+                document.getElementById('field-durata').textContent = d.durata||'—';
+                document.getElementById('field-presenti').textContent = d.presenti.length>0?d.presenti.join(', '):'—';
+                document.getElementById('field-tipologia').textContent = d.tipologia||v.tipo||'—';
+                document.getElementById('field-attivita').innerHTML = d.attivita.length>0?d.attivita.map(a=>`<div class="vf"><div class="vf-v">📌 ${a}</div></div>`).join(''):'<div style="color:var(--text2);">Nessuna attività</div>';
+                document.getElementById('field-problemi').innerHTML = d.problemi.length>0?d.problemi.map(p=>`<div class="issue-row"><div class="issue-dot">🔴</div><div>${p}</div></div>`).join(''):'<div style="color:var(--text2);">Nessun problema</div>';
+                document.getElementById('field-decisioni').innerHTML = d.decisioni.length>0?d.decisioni.map(dc=>`<div class="triz-p">${dc}</div>`).join(''):'<div style="color:var(--text2);">Nessuna decisione</div>';
+                if(d.oreMembri.length>0){const mx=Math.max(...d.oreMembri.map(m=>m.ore),10);document.getElementById('field-ore').innerHTML=d.oreMembri.map(m=>`<div class="ore-row"><span class="ore-name">${m.nome}</span><span class="ore-bw"><span class="ore-bf" style="width:${(m.ore/mx)*100}%"></span></span><span class="ore-v">${m.ore}h</span></div>`).join('');}else document.getElementById('field-ore').innerHTML='<div style="color:var(--text2);">Nessuna ora</div>';
+                document.getElementById('field-passi').innerHTML = d.prossimiPassi.length>0?d.prossimiPassi.map(p=>`<div class="vtask"><div class="vtask-cb"></div><span class="vtask-label">${p.testo}</span>${p.who?`<span class="vtask-who">${p.who}</span>`:''}${p.date?`<span class="vtask-date">${p.date}</span>`:''}</div>`).join(''):'<div style="color:var(--text2);">Nessun passo</div>';
+                
+                document.querySelectorAll('.verbale-block').forEach(b => b.classList.remove('editable'));
+            }
+            
             // ═══════════ ROUTING con POPUP ═══════════
             const pageOrder = ['home', 'fase0', 'fase1', 'specifiche', 'bom', 'triz', 'rischi', 'verbale'];
             const pageNames = {
-                'home': 'Home',
-                'fase0': 'Gestione Progetto',
-                'fase1': 'Pianificazione',
-                'specifiche': 'Specifiche Tecniche',
-                'bom': 'Bill of Materials',
-                'triz': 'Analisi TRIZ',
-                'rischi': 'Rischi & Mitigazioni',
-                'verbale': 'Verbali'
+                'home': 'Home', 'fase0': 'Gestione Progetto', 'fase1': 'Pianificazione',
+                'specifiche': 'Specifiche Tecniche', 'bom': 'Bill of Materials',
+                'triz': 'Analisi TRIZ', 'rischi': 'Rischi & Mitigazioni', 'verbale': 'Verbali'
             };
 
-            // Popup navigation
             const navPopupOverlay = document.getElementById('navPopupOverlay');
             const popupLabel = document.getElementById('popupLabel');
             const popupTitle = document.getElementById('popupTitle');
@@ -818,86 +996,36 @@
             const navPopup = document.getElementById('navPopup');
             
             let popupTimeout;
-            
             function showPopup() {
-                if (navPopupOverlay) {
-                    navPopupOverlay.classList.add('active');
-                    if (popupTimeout) clearTimeout(popupTimeout);
-                    popupTimeout = setTimeout(() => {
-                        if (navPopupOverlay) navPopupOverlay.classList.remove('active');
-                    }, 5000);
-                }
+                if (navPopupOverlay) { navPopupOverlay.classList.add('active'); if (popupTimeout) clearTimeout(popupTimeout);
+                    popupTimeout = setTimeout(() => { if (navPopupOverlay) navPopupOverlay.classList.remove('active'); }, 5000); }
             }
-            
-            function hidePopup() {
-                if (navPopupOverlay) {
-                    navPopupOverlay.classList.remove('active');
-                    if (popupTimeout) clearTimeout(popupTimeout);
-                }
-            }
-            
+            function hidePopup() { if (navPopupOverlay) { navPopupOverlay.classList.remove('active'); if (popupTimeout) clearTimeout(popupTimeout); } }
             function updatePopup(currentPageId) {
                 const activePage = document.querySelector(`[data-page="${currentPageId}"]`);
                 if (!activePage || !navPopupOverlay) return;
-                
-                const nextPage = activePage.dataset.next;
-                const nextPageName = activePage.dataset.nextname;
-                const prevPage = activePage.dataset.prev;
-                const prevPageName = activePage.dataset.prevname;
-                
-                if (nextPage && nextPageName) {
-                    popupLabel.textContent = 'PROSSIMA PAGINA';
-                    popupTitle.textContent = nextPageName;
-                    popupIcon.innerHTML = '➡️';
-                    popupArrow.style.display = 'block';
-                    navPopup.onclick = () => { if (nextPage) goto(nextPage); hidePopup(); };
-                } else if (prevPage && prevPageName) {
-                    popupLabel.textContent = 'TORNA INDIETRO';
-                    popupTitle.textContent = prevPageName;
-                    popupIcon.innerHTML = '⬅️';
-                    popupArrow.style.display = 'block';
-                    navPopup.onclick = () => { if (prevPage) goto(prevPage); hidePopup(); };
-                } else {
-                    navPopupOverlay.classList.remove('active');
-                    return;
-                }
+                const nextPage = activePage.dataset.next; const nextPageName = activePage.dataset.nextname;
+                const prevPage = activePage.dataset.prev; const prevPageName = activePage.dataset.prevname;
+                if (nextPage && nextPageName) { popupLabel.textContent = 'PROSSIMA PAGINA'; popupTitle.textContent = nextPageName; popupIcon.innerHTML = '➡️'; popupArrow.style.display = 'block'; navPopup.onclick = () => { if (nextPage) goto(nextPage); hidePopup(); }; }
+                else if (prevPage && prevPageName) { popupLabel.textContent = 'TORNA INDIETRO'; popupTitle.textContent = prevPageName; popupIcon.innerHTML = '⬅️'; popupArrow.style.display = 'block'; navPopup.onclick = () => { if (prevPage) goto(prevPage); hidePopup(); }; }
+                else { navPopupOverlay.classList.remove('active'); return; }
                 showPopup();
             }
-            
-            // Chiudi popup con il pulsante X
-            if (popupClose) {
-                popupClose.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    hidePopup();
-                });
-            }
-            
-            // Chiudi popup cliccando fuori (sull'overlay)
-            if (navPopupOverlay) {
-                navPopupOverlay.addEventListener('click', (e) => {
-                    if (e.target === navPopupOverlay) hidePopup();
-                });
-            }
+            if (popupClose) { popupClose.addEventListener('click', (e) => { e.stopPropagation(); hidePopup(); }); }
+            if (navPopupOverlay) { navPopupOverlay.addEventListener('click', (e) => { if (e.target === navPopupOverlay) hidePopup(); }); }
 
             function goto(id) {
                 document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
                 const target = document.getElementById('page-' + id);
-                if (target) { 
-                    target.classList.add('active'); 
-                    window.scrollTo({ top: 0, behavior: 'smooth' }); 
-                    updatePopup(id);
-                }
+                if (target) { target.classList.add('active'); window.scrollTo({ top: 0, behavior: 'smooth' }); updatePopup(id); }
                 history.replaceState(null, '', '#' + id);
             }
             window.goto = goto;
 
             window.addEventListener('load', () => { 
                 const hash = location.hash.slice(1); 
-                if (hash) {
-                    goto(hash);
-                } else {
-                    updatePopup('home');
-                }
+                if (hash) goto(hash);
+                else updatePopup('home');
                 checkAdminSession();
                 if (isAdmin) createUploadButtonInSidebar();
             });
@@ -935,16 +1063,11 @@
             const chatSuggestions = document.getElementById('chatSuggestions');
 
             function findBestMatch(query) {
-                const q = query.toLowerCase().trim();
-                let bestMatch = null;
-                let bestScore = 0;
+                const q = query.toLowerCase().trim(); let bestMatch = null; let bestScore = 0;
                 for (const [topicName, topicData] of Object.entries(knowledgeBase)) {
                     let score = 0;
-                    for (const keyword of topicData.keywords) {
-                        if (q.includes(keyword.toLowerCase())) { score += 2; if (keyword.length > 5) score += 1; }
-                    }
-                    const words = q.split(/\s+/);
-                    for (const word of words) { if (topicData.keywords.some(k => k === word)) score += 3; }
+                    for (const keyword of topicData.keywords) { if (q.includes(keyword.toLowerCase())) { score += 2; if (keyword.length > 5) score += 1; } }
+                    const words = q.split(/\s+/); for (const word of words) { if (topicData.keywords.some(k => k === word)) score += 3; }
                     if (score > bestScore) { bestScore = score; bestMatch = topicData; }
                 }
                 if (bestScore >= 2) return bestMatch.response;
@@ -953,20 +1076,14 @@
             }
 
             function addMessage(text, isUser = false) {
-                const msg = document.createElement('div');
-                msg.className = `chat-message ${isUser ? 'user' : 'bot'}`;
+                const msg = document.createElement('div'); msg.className = `chat-message ${isUser ? 'user' : 'bot'}`;
                 msg.innerHTML = `<div class="chat-avatar">${isUser ? '👤' : '🤖'}</div><div class="chat-bubble">${text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>')}</div>`;
-                chatMessages.appendChild(msg);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+                chatMessages.appendChild(msg); chatMessages.scrollTop = chatMessages.scrollHeight;
             }
 
             function processQuery(text) {
-                if (!text.trim()) return;
-                addMessage(text, true);
-                chatInput.value = '';
-                chatTyping.classList.add('active');
-                setTimeout(() => {
-                    chatTyping.classList.remove('active');
+                if (!text.trim()) return; addMessage(text, true); chatInput.value = ''; chatTyping.classList.add('active');
+                setTimeout(() => { chatTyping.classList.remove('active');
                     const response = findBestMatch(text);
                     if (response) { addMessage(response, false); }
                     else { addMessage('🤔 Non ho trovato una risposta specifica.\n\nProva a chiedermi:\n• Cos\'è CleaningBoat?\n• Chi è [nome membro]?\n• Budget e tempistiche\n• Quali tecnologie usate?\n• Come funziona UART?\n• Quali rischi ci sono?\n• Cos\'è TRIZ?\n• Quali classi di rifiuti?\n• BOM e componenti', false); }
@@ -1009,34 +1126,18 @@
             function buildAllSlides() {
                 slideArea.innerHTML = '';
                 slidesData.forEach((slide, index) => {
-                    const div = document.createElement('div');
-                    div.className = 'pres-slide';
-                    div.innerHTML = `<div class="pres-slide-number">SLIDE ${slide.number} / ${totalSlides}</div>
-                        <div class="pres-slide-big-icon">${slide.icon}</div>
-                        <div class="pres-slide-title">${slide.title}</div>
-                        <div class="pres-slide-subtitle">${slide.subtitle}</div>
-                        <ul class="pres-slide-list" style="text-align:center;">${slide.content.map(c => `<li style="justify-content:center;">${c}</li>`).join('')}</ul>`;
-                    div.dataset.index = index;
-                    slideArea.appendChild(div);
+                    const div = document.createElement('div'); div.className = 'pres-slide';
+                    div.innerHTML = `<div class="pres-slide-number">SLIDE ${slide.number} / ${totalSlides}</div><div class="pres-slide-big-icon">${slide.icon}</div><div class="pres-slide-title">${slide.title}</div><div class="pres-slide-subtitle">${slide.subtitle}</div><ul class="pres-slide-list" style="text-align:center;">${slide.content.map(c => `<li style="justify-content:center;">${c}</li>`).join('')}</ul>`;
+                    div.dataset.index = index; slideArea.appendChild(div);
                 });
                 presNav.innerHTML = '';
-                for (let i = 0; i < totalSlides; i++) {
-                    const dot = document.createElement('div');
-                    dot.className = 'pres-nav-dot';
-                    if (i === 0) dot.classList.add('active');
-                    dot.addEventListener('click', () => goToSlide(i));
-                    presNav.appendChild(dot);
-                }
+                for (let i = 0; i < totalSlides; i++) { const dot = document.createElement('div'); dot.className = 'pres-nav-dot'; if (i === 0) dot.classList.add('active'); dot.addEventListener('click', () => goToSlide(i)); presNav.appendChild(dot); }
             }
             function updateSlideUI() {
-                const allSlides = slideArea.querySelectorAll('.pres-slide');
-                allSlides.forEach((s, i) => { s.classList.remove('active'); if (i === currentSlide) s.classList.add('active'); });
-                presProgress.textContent = `${currentSlide + 1}/${totalSlides}`;
-                presTimelineFill.style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
-                presPrev.disabled = currentSlide === 0;
-                presNext.disabled = currentSlide === totalSlides - 1;
-                const dots = presNav.querySelectorAll('.pres-nav-dot');
-                dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+                const allSlides = slideArea.querySelectorAll('.pres-slide'); allSlides.forEach((s, i) => { s.classList.remove('active'); if (i === currentSlide) s.classList.add('active'); });
+                presProgress.textContent = `${currentSlide + 1}/${totalSlides}`; presTimelineFill.style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+                presPrev.disabled = currentSlide === 0; presNext.disabled = currentSlide === totalSlides - 1;
+                const dots = presNav.querySelectorAll('.pres-nav-dot'); dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
             }
             function goToSlide(index) { if (index < 0 || index >= totalSlides) return; currentSlide = index; updateSlideUI(); }
             function openPresentation() { buildAllSlides(); currentSlide = 0; updateSlideUI(); overlay.classList.add('open'); document.body.style.overflow = 'hidden'; }
@@ -1054,104 +1155,114 @@
             function loadVerbali() { 
                 try { 
                     const stored = localStorage.getItem(STORAGE_KEY);
-                    if (stored) {
-                        verbaliDB = JSON.parse(stored);
-                    } else {
-                        // Verifica se ci sono verbali di esempio
-                        const exampleVerbale = `Data: 20 Maggio 2025
-Luogo: Laboratorio ITS
-Durata: 3 ore
-Presenti: Luchini A., Genzini L., Bogdan M., Ayad C., Gianoglio G., Fionda G.
-Tipologia: Sessione di sviluppo
-
-Attività Svolte:
-- Setup iniziale hardware Arduino Uno Q e camera
-- Test comunicazione seriale
-- Raccolta prime 50 immagini del dataset
-- Configurazione Edge Impulse
-
-Problemi Riscontrati:
-- La camera non veniva rilevata all'avvio (risolto riavviando)
-- Overheating del powerbank dopo 2 ore
-
-Decisioni Prese:
-- Utilizzare powerbank da 10000mAh
-- Alternare periodi di lavoro con pause
-
-Ore per Membro:
-Luchini A.: 3h
-Genzini L.: 3h
-Bogdan M.: 3h
-Ayad C.: 3h
-Gianoglio G.: 3h
-Fionda G.: 3h
-
-Prossimi Passi (assegnato a / entro):
-- Completare raccolta 500 immagini (Luchini / 30 maggio)
-- Addestrare primo modello su Edge Impulse (Bogdan / 2 giugno)
-- Progettare supporto CAD 3D (Genzini / 28 maggio)`;
-                        
-                        verbaliDB = [{
-                            id: 'v_example',
-                            date: '20 Maggio 2025',
-                            title: 'Verbale Sessione 1 - Setup Iniziale',
-                            tipo: 'Sessione di sviluppo',
-                            content: exampleVerbale,
-                            uploadedBy: 'system'
-                        }];
-                        saveVerbali();
-                    }
-                } catch(e) { 
-                    console.error(e);
-                    verbaliDB = []; 
-                } 
+                    if (stored) { verbaliDB = JSON.parse(stored); } 
+                    else { verbaliDB = []; } 
+                } catch(e) { verbaliDB = []; } 
             }
-            function saveVerbali() { 
-                try { 
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(verbaliDB)); 
-                } catch(e) {} 
-            }
+            function saveVerbali() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(verbaliDB)); } catch(e) {} }
             loadVerbali();
+            
             const sidebarVerbaliList = document.getElementById('sidebarVerbaliList');
             const sidebarCount = document.getElementById('sidebarCount');
+            
             function renderSidebar() {
                 if (!sidebarVerbaliList) return;
-                sidebarVerbaliList.innerHTML = verbaliDB.length === 0 ? '<div class="sidebar-empty">📭 Nessun verbale.</div>' : '';
-                verbaliDB.forEach((v, i) => {
-                    const item = document.createElement('div'); 
-                    item.className = 'sidebar-verbale-item';
-                    item.innerHTML = `<div class="sidebar-verbale-info"><div class="sidebar-verbale-date">📅 ${v.date||'Data sconosciuta'}</div><div class="sidebar-verbale-title">${v.title||'Senza titolo'}</div></div>${isAdmin ? '<button class="sidebar-verbale-delete">🗑️</button>' : ''}`;
-                    item.querySelector('.sidebar-verbale-info').addEventListener('click', () => selectVerbale(i));
-                    const deleteBtn = item.querySelector('.sidebar-verbale-delete');
-                    if (deleteBtn) {
-                        deleteBtn.addEventListener('click', (e) => { e.stopPropagation(); if(confirm('Eliminare?')){verbaliDB.splice(i,1);saveVerbali();renderSidebar();document.getElementById('emptyState').style.display='block';document.getElementById('verbaleContent').style.display='none';} });
+                sidebarVerbaliList.innerHTML = '';
+                
+                // Mostra 10 posti (slot)
+                for (let i = 0; i < MAX_VERBALI; i++) {
+                    const v = verbaliDB[i] || null;
+                    const slot = document.createElement('div');
+                    if (v) {
+                        slot.className = 'sidebar-verbale-item';
+                        if (currentVerbaleIndex === i) slot.classList.add('active');
+                        if (isAdmin) slot.classList.add('editable');
+                        slot.innerHTML = `
+                            <div class="sidebar-verbale-info">
+                                <div class="sidebar-verbale-date">📅 Posto #${i+1} · ${v.date||'Data sconosciuta'}</div>
+                                <div class="sidebar-verbale-title">${v.title||'Senza titolo'}</div>
+                                <div class="sidebar-verbale-meta">${v.tipo||''}</div>
+                            </div>
+                            ${isAdmin ? '<button class="sidebar-verbale-delete" title="Elimina">🗑️</button>' : ''}
+                        `;
+                        slot.querySelector('.sidebar-verbale-info').addEventListener('click', () => selectVerbale(i));
+                        const deleteBtn = slot.querySelector('.sidebar-verbale-delete');
+                        if (deleteBtn) {
+                            deleteBtn.addEventListener('click', (e) => { 
+                                e.stopPropagation(); 
+                                if(confirm(`Eliminare il verbale "${v.title}" dal posto #${i+1}?`)){
+                                    verbaliDB.splice(i,1);
+                                    saveVerbali();
+                                    if (currentVerbaleIndex === i) {
+                                        currentVerbaleIndex = -1;
+                                        document.getElementById('emptyState').style.display='block';
+                                        document.getElementById('verbaleContent').style.display='none';
+                                    }
+                                    renderSidebar();
+                                    createUploadButtonInSidebar();
+                                }
+                            });
+                        }
+                    } else {
+                        slot.className = 'sidebar-verbale-item';
+                        slot.style.opacity = '0.5';
+                        slot.style.borderStyle = 'dashed';
+                        slot.innerHTML = `
+                            <div class="sidebar-verbale-info">
+                                <div class="sidebar-verbale-date">📭 Posto #${i+1}</div>
+                                <div class="sidebar-verbale-title" style="color:var(--text2);">Vuoto</div>
+                                <div class="sidebar-verbale-meta">Disponibile per upload</div>
+                            </div>
+                        `;
                     }
-                    sidebarVerbaliList.appendChild(item);
-                });
-                if(sidebarCount) sidebarCount.textContent = verbaliDB.length === 0 ? 'Nessun verbale' : `${verbaliDB.length} verbale${verbaliDB.length!==1?'i':''}`;
+                    sidebarVerbaliList.appendChild(slot);
+                }
+                
+                const count = verbaliDB.length;
+                if(sidebarCount) sidebarCount.textContent = `${count}/10 verbale${count!==1?'i':''} · ${MAX_VERBALI-count} posti liberi`;
+                
+                // Aggiorna bottone modifica
+                updateEditButtonVisibility();
             }
-            renderSidebar();
             
             function selectVerbale(index) {
-                const v = verbaliDB[index]; if(!v) return;
-                document.querySelectorAll('.sidebar-verbale-item').forEach((item,i) => item.classList.toggle('active', i===index));
-                document.getElementById('emptyState').style.display = 'none'; 
+                if (index >= verbaliDB.length) return;
+                currentVerbaleIndex = index;
+                const v = verbaliDB[index];
+                if (!v) return;
+                
+                document.getElementById('emptyState').style.display = 'none';
                 document.getElementById('verbaleContent').style.display = 'block';
-                document.getElementById('verbaleFileInfo').innerHTML = `<span>📂</span><span><strong>${v.title}</strong> · ${v.date}</span>`;
-                const d = parseVerbale(v.content);
-                document.getElementById('field-data').textContent = d.date||v.date||'—'; 
-                document.getElementById('field-luogo').textContent = d.luogo||'—';
-                document.getElementById('field-durata').textContent = d.durata||'—'; 
-                document.getElementById('field-presenti').textContent = d.presenti.length>0?d.presenti.join(', '):'—';
-                document.getElementById('field-tipologia').textContent = d.tipologia||v.tipo||'—';
-                document.getElementById('field-attivita').innerHTML = d.attivita.length>0?d.attivita.map(a=>`<div class="vf"><div class="vf-v">📌 ${a}</div></div>`).join(''):'<div style="color:var(--text2);">Nessuna attività</div>';
-                document.getElementById('field-problemi').innerHTML = d.problemi.length>0?d.problemi.map(p=>`<div class="issue-row"><div class="issue-dot">🔴</div><div>${p}</div></div>`).join(''):'<div style="color:var(--text2);">Nessun problema</div>';
-                document.getElementById('field-decisioni').innerHTML = d.decisioni.length>0?d.decisioni.map(dc=>`<div class="triz-p">${dc}</div>`).join(''):'<div style="color:var(--text2);">Nessuna decisione</div>';
-                if(d.oreMembri.length>0){const mx=Math.max(...d.oreMembri.map(m=>m.ore),10);document.getElementById('field-ore').innerHTML=d.oreMembri.map(m=>`<div class="ore-row"><span class="ore-name">${m.nome}</span><span class="ore-bw"><span class="ore-bf" style="width:${(m.ore/mx)*100}%"></span></span><span class="ore-v">${m.ore}h</span></div>`).join('');}else document.getElementById('field-ore').innerHTML='<div style="color:var(--text2);">Nessuna ora</div>';
-                document.getElementById('field-passi').innerHTML = d.prossimiPassi.length>0?d.prossimiPassi.map(p=>`<div class="vtask"><div class="vtask-cb"></div><span class="vtask-label">${p.testo}</span>${p.who?`<span class="vtask-who">${p.who}</span>`:''}${p.date?`<span class="vtask-date">${p.date}</span>`:''}</div>`).join(''):'<div style="color:var(--text2);">Nessun passo</div>';
+                document.getElementById('verbaleFileInfo').innerHTML = `<span>📂</span><span><strong>Posto #${index+1}: ${v.title}</strong> · ${v.date}</span>`;
+                
+                if (isEditing) {
+                    renderVerbaleEditable(index);
+                } else {
+                    renderVerbaleView(index);
+                }
+                
+                // Aggiungi bottone modifica se non esiste
+                let editBtn = document.getElementById('editToggleBtn');
+                if (!editBtn) {
+                    const verbaleMain = document.querySelector('.verbale-main .ph-mini');
+                    if (verbaleMain) {
+                        editBtn = document.createElement('button');
+                        editBtn.id = 'editToggleBtn';
+                        editBtn.className = 'edit-save-btn';
+                        editBtn.textContent = '✏️ Modifica Verbale';
+                        editBtn.style.display = (isAdmin) ? 'block' : 'none';
+                        editBtn.addEventListener('click', toggleEditMode);
+                        verbaleMain.appendChild(editBtn);
+                    }
+                }
+                updateEditButtonVisibility();
+                
+                renderSidebar();
             }
+            
             function parseVerbale(c) {
                 const d={date:'',luogo:'',durata:'',presenti:[],tipologia:'',attivita:[],problemi:[],decisioni:[],oreMembri:[],prossimiPassi:[]};
+                if (!c) return d;
                 const dm=c.match(/Data[:\s]*(\d{1,2}\s*(?:gen|feb|mar|apr|mag|giu|lug|ago|set|ott|nov|dic)\w*\s*\d{4})/i)||c.match(/Data[:\s]*(\d{1,2}[\/\-.]\d{1,2}[\/\-.]\d{2,4})/i);if(dm)d.date=dm[1].trim();
                 const lm=c.match(/Luogo[:\s]*([^\n]+)/i);if(lm)d.luogo=lm[1].trim();
                 const dm2=c.match(/Durata[:\s]*([^\n]+)/i);if(dm2)d.durata=dm2[1].trim();
@@ -1164,6 +1275,10 @@ Prossimi Passi (assegnato a / entro):
                 const pss=c.match(/Prossimi[:\s]*(?:Passi[:\s]*)?([\s\S]*?)$/i);if(pss)d.prossimiPassi=pss[1].split('\n').map(l=>l.replace(/^[\s\-\•\*\d\.\#]+/,'').trim()).filter(l=>l.length>3).map(p=>{const w=p.match(/(?:assegnato a|responsabile)[:\s]*([A-Za-zÀ-ÿ\s]+)/i);const dd=p.match(/(?:entro|scadenza)[:\s]*(\d{1,2}[\/\-.]?\d{1,2}[\/\-.]?\d{2,4})/i);return{testo:p,who:w?w[1].trim():'',date:dd?dd[1].trim():''};});
                 return d;
             }
+
+            renderSidebar();
+            if (verbaliDB.length > 0) selectVerbale(0);
+            createUploadButtonInSidebar();
 
             // ═══════════ DATA POPULATION ═══════════
             const team=[{abbr:'PM',name:'Luchini Alessandro',role:'Referente: IA, BOM, Schema Elettrico, Labeling',c:'#00d4ff'},{abbr:'HW/SW',name:'Genzini Lorenzo',role:'HW Lead: CAD, Sito, IA, BOM, Labeling',c:'#00ff88'},{abbr:'SW',name:'Bogdan Matteo',role:'Software: Librerie, Arduino, Training ML',c:'#00ff88'},{abbr:'DOC',name:'Ayad Chakib',role:'Documentazione: Verbali, Labeling',c:'#ffaa00'},{abbr:'SW',name:'Gianoglio Giovanni',role:'Software: Arduino, ML, Stampa 3D, IA',c:'#00ff88'},{abbr:'DOC/SW',name:'Fionda Gianluca',role:'Doc/Software: IA, Labeling, Training',c:'#ffaa00'}];
@@ -1179,7 +1294,7 @@ Prossimi Passi (assegnato a / entro):
             const ml=document.getElementById('f1-ms');if(ml)ms.forEach(m=>{const e=document.createElement('div');e.className='ms-item';e.innerHTML=`<div class="ms-date">${m.date}</div><div><div class="ms-title">${m.title}</div></div><span class="ms-badge" style="color:${m.bc};border-color:${m.bc};">${m.badge}</span>`;ml.appendChild(e);});
             const slidesP=[{t:"0-2'",title:'Team',desc:'Nomi, ruoli'},{t:"2-4'",title:'Problema',desc:'AI e rifiuti'},{t:"4-7'",title:'Obiettivi',desc:'Firmware, ML, 3D'},{t:"7-10'",title:'Gantt',desc:'Timeline'},{t:"10-12'",title:'Metodologia',desc:'TRIZ'},{t:"12-14'",title:'Rischi',desc:'Mitigazioni'},{t:"14-15'",title:'Q&A',desc:'Domande'}];
             const sl=document.getElementById('f1-slides');if(sl)slidesP.forEach((s,i)=>{const e=document.createElement('div');e.className='slide-row';e.innerHTML=`<div class="slide-time">${s.t}</div><div class="slide-line"></div><div><div class="slide-title">${i+1}. ${s.title}</div><div class="slide-desc">${s.desc}</div></div>`;sl.appendChild(e);});
-            const rf=[{id:'RF01',req:'Riconoscere 6 categorie',p:'Alta'},{id:'RH06',req:'Latenza ≤2s',p:'Media'},{id:'RF04',req:'UART con P4',p:'Alta'},{id:'RF01',req:'Accuratezza ≥80%',p:'Alta'}];
+            const rf=[{id:'RF01',req:'Riconoscere 6 categorie',p:'Alta'},{id:'RF06',req:'Latenza ≤2s',p:'Media'},{id:'RF04',req:'UART con P4',p:'Alta'},{id:'RF01',req:'Accuratezza ≥80%',p:'Alta'}];
             const rh=[{id:'RH01',req:'Flash ≥256KB',p:'Alta'},{id:'RH02',req:'Camera 8 MP',p:'Alta'},{id:'RH03',req:'Powerbank 5V',p:'Alta'},{id:'RH06',req:'Anti-schizzi',p:'Media'}];
             function rs(d,id){const tb=document.getElementById(id);if(!tb)return;d.forEach(r=>{const tr=document.createElement('tr');tr.innerHTML=`<td class="spec-id">${r.id}</td><td>${r.req}</td><td><span class="badge ${r.p==='Alta'?'b-high':'b-med'}">${r.p}</span></td>`;tb.appendChild(tr);});}
             rs(rf,'sp-rf');rs(rh,'sp-rh');
@@ -1197,14 +1312,11 @@ Prossimi Passi (assegnato a / entro):
             const trg=document.getElementById('triz-contr');if(trg)tc.forEach(t=>{const e=document.createElement('div');e.className='triz-card';e.innerHTML=`<div class="triz-num">${t.num}</div><div class="triz-title">${t.title}</div><div class="triz-sub">${t.sub}</div>`;trg.appendChild(e);});
             const mr=[{contr:'Accuratezza vs Latenza',migliorato:'Precisione',peggiorato:'Velocità',principi:'10,24,35'},{contr:'Robustezza vs Peso',migliorato:'Adattabilità',peggiorato:'Complessità',principi:'15,29,37'}];
             const mxg=document.getElementById('triz-matrix-rows');if(mxg)mr.forEach(r=>{const row=document.createElement('div');row.className='triz-mrow';row.innerHTML=`<div class="triz-mcell"><strong>${r.contr}</strong></div><div class="triz-mcell">${r.migliorato}</div><div class="triz-mcell">${r.peggiorato}</div><div class="triz-mcell"><span class="triz-tag">${r.principi}</span></div>`;mxg.appendChild(row);});
-
-            // ═══════════ RISCHI ═══════════
             const rischiTecnici=[{level:'high',title:'Mancata comunicazione UART con Progetto 4',mit:'Test incrociato con analizzatore logico entro il 23/5. Verificare GND comune e baud rate.'},{level:'high',title:'Accuratezza modello ML < 80%',mit:'Raccogliere 500+ immagini in condizioni variabili. Applicare data augmentation spinta.'},{level:'med',title:'Latenza eccessiva (>2 secondi)',mit:'Ottimizzare MobileNetV1 a 96×96 grayscale. Usare quantizzazione INT8.'},{level:'med',title:'Overfitting del modello ML',mit:'Data augmentation aggressiva. Suddividere dataset in training/validation/test.'},{level:'med',title:'Dataset sbilanciato',mit:'Minimo 80-100 immagini per classe. Oversampling classi minoritarie.'},{level:'med',title:'Guasto hardware',mit:'Scheda Arduino di riserva. Testare camera prima del collaudo.'},{level:'low',title:'Problemi di alimentazione',mit:'Testare autonomia powerbank. Usare ≥5000mAh.'},{level:'med',title:'Surriscaldamento componenti',mit:'Fori di ventilazione con membrana traspirante.'},{level:'med',title:'Perdita di impermeabilità',mit:'Vernice acrilica + silicone sigillante. Test in vasca.'}];
             const rischiOrganizzativi=[{level:'high',title:'Ritardo nelle consegne (milestone)',mit:'Gantt aggiornato settimanalmente. Buffer di 2-3 giorni.'},{level:'med',title:'Assenza di un membro del team',mit:'Documentare tutto. Backup designato per ogni ruolo.'},{level:'med',title:'Mancanza di comunicazione interna',mit:'Verbali dopo ogni sessione. GitHub Projects.'},{level:'med',title:'Sovraccarico di lavoro',mit:'Monitorare ore effettive. Ridistribuire compiti.'},{level:'low',title:'Conflitti interni al team',mit:'Ruoli chiari. Decisioni a maggioranza con PM.'}];
             const rischiEsterni=[{level:'med',title:'Condizioni meteo avverse',mit:'Data di backup. Test in vasca indoor.'},{level:'med',title:'Luce solare acceca la camera',mit:'Immagini con controluce nel dataset. Paraluce 3D.'},{level:'med',title:'Onde/schizzi danneggiano elettronica',mit:'Test in vasca con onde simulate. Doppia protezione.'},{level:'low',title:'Rifiuti non previsti',mit:'Classe "Altro". Soglia di confidenza minima.'},{level:'low',title:'Perdita del prototipo',mit:'Fissaggio sicuro. Test di galleggiamento.'}];
             function renderRischi(titolo,rischi){const c=document.getElementById('rischi-list');if(!c)return;const d=document.createElement('div');d.innerHTML=`<div class="slabel">${titolo}</div>`;rischi.forEach(r=>{let l='',i='';if(r.level==='high'){i='🔴';}else if(r.level==='med'){l='med';i='🟡';}else{l='low';i='🟢';}const card=document.createElement('div');card.className=`risk-card ${l}`;card.innerHTML=`<div class="risk-hd"><span>${i}</span><span class="risk-title">${r.title}</span></div><div class="risk-mit">➤ ${r.mit}</div>`;d.appendChild(card);});c.appendChild(d);}
             const rkg=document.getElementById('rischi-list');if(rkg){rkg.innerHTML='';renderRischi('🔧 Rischi Tecnici (Hardware & Software)',rischiTecnici);renderRischi('👥 Rischi Organizzativi e di Team',rischiOrganizzativi);renderRischi('🌍 Rischi Esterni e Ambientali',rischiEsterni);}
-
             buildAllSlides();
             
             // Eventi login
