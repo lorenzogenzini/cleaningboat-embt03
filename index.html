@@ -40,11 +40,79 @@
         .nav-link.highlight { border-color:rgba(0,212,255,0.4); color:var(--accent); font-weight:600; }
         .nav-link.chat-highlight { border-color:rgba(180,77,255,0.5); color:var(--purple); font-weight:600; animation:chatGlow 2s ease-in-out infinite; }
         @keyframes chatGlow { 0%,100%{box-shadow:0 0 5px rgba(180,77,255,0.2)} 50%{box-shadow:0 0 20px rgba(180,77,255,0.5)} }
-        .chat-widget { position:fixed; bottom:1.5rem; right:1.5rem; z-index:9999; font-family:var(--ff-body); }
+        
+        /* FRECCIA DI NAVIGAZIONE MIGLIORATA - VISIBILE SU TUTTE LE PAGINE */
+        .navigation-arrow {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 10000;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        .arrow-circle {
+            width: 65px;
+            height: 65px;
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.4), 0 5px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+        .arrow-circle svg {
+            width: 32px;
+            height: 32px;
+            fill: white;
+            transition: transform 0.3s ease;
+        }
+        .navigation-arrow:hover .arrow-circle {
+            transform: scale(1.1);
+            box-shadow: 0 0 50px rgba(0, 212, 255, 0.6), 0 8px 25px rgba(0,0,0,0.4);
+        }
+        .navigation-arrow:hover .arrow-circle svg {
+            transform: translateX(5px);
+        }
+        .arrow-label {
+            position: absolute;
+            right: 75px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(18, 18, 26, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-family: var(--ff-mono);
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--accent);
+            white-space: nowrap;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+            pointer-events: none;
+        }
+        .navigation-arrow:hover .arrow-label {
+            opacity: 1;
+            visibility: visible;
+            right: 85px;
+        }
+        @keyframes arrowPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); box-shadow: 0 0 40px rgba(0, 212, 255, 0.7); }
+        }
+        .navigation-arrow.pulse .arrow-circle {
+            animation: arrowPulse 0.5s ease-in-out;
+        }
+        
+        .chat-widget { position:fixed; bottom:1.5rem; left:1.5rem; z-index:9999; font-family:var(--ff-body); }
         .chat-toggle { width:55px; height:55px; border-radius:50%; background:linear-gradient(135deg,var(--purple),var(--accent)); border:none; cursor:pointer; font-size:1.5rem; color:#fff; box-shadow:0 0 30px rgba(180,77,255,0.4); transition:all var(--transition); display:flex; align-items:center; justify-content:center; }
         .chat-toggle:hover { transform:scale(1.1); box-shadow:0 0 50px rgba(180,77,255,0.6); }
         .chat-toggle.active { background:var(--red); }
-        .chat-panel { display:none; position:absolute; bottom:70px; right:0; width:400px; max-height:600px; background:rgba(18,18,26,0.98); backdrop-filter:blur(25px); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; flex-direction:column; box-shadow:0 20px 60px rgba(0,0,0,0.8); }
+        .chat-panel { display:none; position:absolute; bottom:70px; left:0; width:400px; max-height:600px; background:rgba(18,18,26,0.98); backdrop-filter:blur(25px); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; flex-direction:column; box-shadow:0 20px 60px rgba(0,0,0,0.8); }
         .chat-panel.open { display:flex; }
         .chat-header { padding:1rem 1.2rem; background:rgba(0,0,0,0.3); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:0.5rem; }
         .chat-header-icon { font-size:1.2rem; }
@@ -291,13 +359,13 @@
         .pres-timeline { position:absolute; bottom:0; left:0; width:100%; height:3px; background:var(--border); z-index:5; }
         .pres-timeline-fill { height:100%; background:var(--accent); transition:width 0.5s ease; border-radius:0 2px 2px 0; }
         
-        /* NUOVO LAYOUT VERBALI CON 10 POSTI */
+        /* NUOVO LAYOUT VERBALI CON POSTI ILLIMITATI */
         .verbale-layout { display:flex; min-height:calc(100vh - 75px); }
         .verbale-sidebar { width:350px; min-width:350px; background:rgba(18,18,26,0.7); border-right:1px solid var(--border); backdrop-filter:blur(15px); display:flex; flex-direction:column; height:calc(100vh - 75px); position:sticky; top:75px; overflow-y:auto; z-index:10; }
         .sidebar-header { padding:1.2rem; border-bottom:1px solid var(--border); position:sticky; top:0; background:rgba(18,18,26,0.95); backdrop-filter:blur(15px); z-index:2; }
         .sidebar-title { font-family:var(--ff-display); font-size:0.9rem; font-weight:700; }
         .sidebar-subtitle { font-size:0.65rem; color:var(--text2); }
-        .sidebar-upload-btn { display:block; width:100%; padding:0.6rem; margin-top:0.65rem; background:transparent; border:2px dashed var(--border); border-radius:var(--radius-sm); color:var(--accent); font-size:0.7rem; font-weight:600; cursor:pointer; text-align:center; }
+        .sidebar-upload-btn { display:block; width:100%; padding:0.6rem; margin-top:0.65rem; background:transparent; border:2px dashed var(--border); border-radius:var(--radius-sm); color:var(--accent); font-size:0.7rem; font-weight:600; cursor:pointer; text-align:center; transition:all var(--transition); }
         .sidebar-upload-btn:hover { border-color:var(--accent); background:rgba(0,212,255,0.05); }
         .sidebar-upload-input { display:none; }
         .sidebar-verbali-list { flex:1; overflow-y:auto; padding:0.4rem; }
@@ -309,12 +377,30 @@
         .sidebar-verbale-date { font-family:var(--ff-mono); font-size:0.55rem; color:var(--accent); }
         .sidebar-verbale-title { font-family:var(--ff-display); font-size:0.75rem; font-weight:600; }
         .sidebar-verbale-meta { font-size:0.58rem; color:var(--text2); }
-        .sidebar-verbale-delete { background:none; border:none; color:var(--text2); cursor:pointer; font-size:0.7rem; padding:0.15rem 0.35rem; border-radius:3px; }
+        .sidebar-verbale-delete { background:none; border:none; color:var(--text2); cursor:pointer; font-size:0.7rem; padding:0.15rem 0.35rem; border-radius:3px; transition:all var(--transition); }
         .sidebar-verbale-delete:hover { color:var(--red); background:rgba(255,68,102,0.1); }
         .sidebar-empty { text-align:center; padding:2rem 1rem; color:var(--text2); font-style:italic; font-size:0.75rem; }
         .sidebar-footer { padding:0.6rem 0.85rem; border-top:1px solid var(--border); font-size:0.58rem; color:var(--text2); text-align:center; }
         
-        /* VERBALE MAIN - MODIFICA E VISUALIZZAZIONE */
+        /* ADMIN AREA */
+        .sidebar-admin-area { padding:0.75rem; border-top:1px solid var(--border); border-bottom:1px solid var(--border); background:rgba(0,212,255,0.05); display:flex; flex-direction:column; gap:0.5rem; }
+        .admin-btn { width:100%; padding:0.5rem; background:rgba(180,77,255,0.2); border:1px solid var(--purple); border-radius:var(--radius-sm); color:var(--purple); font-size:0.7rem; font-weight:600; cursor:pointer; text-align:center; transition:all var(--transition); }
+        .admin-btn:hover { background:rgba(180,77,255,0.4); border-color:var(--accent); color:var(--accent); }
+        .admin-badge { background:var(--purple); color:#fff; padding:0.2rem 0.5rem; border-radius:4px; font-size:0.6rem; margin-left:0.5rem; }
+        .edit-save-btn { width:100%; padding:0.5rem; background:rgba(0,255,136,0.2); border:1px solid var(--green); border-radius:var(--radius-sm); color:var(--green); font-size:0.7rem; font-weight:600; cursor:pointer; text-align:center; margin-top:0.5rem; transition:all var(--transition); }
+        .edit-save-btn:hover { background:rgba(0,255,136,0.4); }
+        
+        /* LOGIN OVERLAY */
+        .login-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); backdrop-filter:blur(10px); z-index:20000; display:flex; align-items:center; justify-content:center; opacity:0; visibility:hidden; transition:all var(--transition); }
+        .login-overlay.active { opacity:1; visibility:visible; }
+        .login-box { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:2rem; width:320px; text-align:center; box-shadow:0 0 50px rgba(180,77,255,0.3); }
+        .login-box h3 { font-family:var(--ff-display); font-size:1.2rem; margin-bottom:1rem; color:var(--accent); }
+        .login-input { width:100%; padding:0.75rem; margin:1rem 0; background:rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-family:var(--ff-mono); font-size:0.8rem; }
+        .login-input:focus { outline:none; border-color:var(--purple); }
+        .login-submit { padding:0.6rem 1.5rem; background:linear-gradient(135deg,var(--purple),var(--accent)); border:none; border-radius:var(--radius-sm); color:#fff; font-weight:600; cursor:pointer; }
+        .login-error { color:var(--red); font-size:0.7rem; margin-top:0.5rem; display:none; }
+        .ph-mini { padding:1rem 0; }
+        
         .verbale-main { flex:1; padding:1.5rem 2rem; overflow-y:auto; height:calc(100vh - 75px); }
         .verbale-block { border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:0.85rem; background:rgba(18,18,26,0.5); }
         .verbale-block.editable { border-color:var(--green); }
@@ -345,131 +431,13 @@
         .empty-state-icon { font-size:2.5rem; margin-bottom:0.75rem; }
         .empty-state-text { font-style:italic; }
         
-        /* ADMIN AREA */
-        .sidebar-admin-area { padding:0.75rem; border-top:1px solid var(--border); border-bottom:1px solid var(--border); background:rgba(0,212,255,0.05); display:flex; flex-direction:column; gap:0.5rem; }
-        .admin-btn { width:100%; padding:0.5rem; background:rgba(180,77,255,0.2); border:1px solid var(--purple); border-radius:var(--radius-sm); color:var(--purple); font-size:0.7rem; font-weight:600; cursor:pointer; text-align:center; transition:all var(--transition); }
-        .admin-btn:hover { background:rgba(180,77,255,0.4); border-color:var(--accent); color:var(--accent); }
-        .admin-badge { background:var(--purple); color:#fff; padding:0.2rem 0.5rem; border-radius:4px; font-size:0.6rem; margin-left:0.5rem; }
-        .edit-save-btn { width:100%; padding:0.5rem; background:rgba(0,255,136,0.2); border:1px solid var(--green); border-radius:var(--radius-sm); color:var(--green); font-size:0.7rem; font-weight:600; cursor:pointer; text-align:center; margin-top:0.5rem; transition:all var(--transition); }
-        .edit-save-btn:hover { background:rgba(0,255,136,0.4); }
-        
-        /* LOGIN OVERLAY */
-        .login-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); backdrop-filter:blur(10px); z-index:20000; display:flex; align-items:center; justify-content:center; opacity:0; visibility:hidden; transition:all var(--transition); }
-        .login-overlay.active { opacity:1; visibility:visible; }
-        .login-box { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:2rem; width:320px; text-align:center; box-shadow:0 0 50px rgba(180,77,255,0.3); }
-        .login-box h3 { font-family:var(--ff-display); font-size:1.2rem; margin-bottom:1rem; color:var(--accent); }
-        .login-input { width:100%; padding:0.75rem; margin:1rem 0; background:rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-family:var(--ff-mono); font-size:0.8rem; }
-        .login-input:focus { outline:none; border-color:var(--purple); }
-        .login-submit { padding:0.6rem 1.5rem; background:linear-gradient(135deg,var(--purple),var(--accent)); border:none; border-radius:var(--radius-sm); color:#fff; font-weight:600; cursor:pointer; }
-        .login-error { color:var(--red); font-size:0.7rem; margin-top:0.5rem; display:none; }
-        .ph-mini { padding:1rem 0; }
-        
-        /* NUOVO POPUP DI NAVIGAZIONE */
-        .nav-popup-overlay {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
-        .nav-popup-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        .nav-popup {
-            background: rgba(18, 18, 26, 0.98);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            border-radius: 60px;
-            padding: 12px 24px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            box-shadow: 0 10px 40px rgba(0, 212, 255, 0.2), 0 0 20px rgba(0, 212, 255, 0.1);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            animation: popupGlow 2s ease-in-out infinite;
-        }
-        .nav-popup:hover {
-            transform: translateY(-3px);
-            border-color: var(--accent);
-            box-shadow: 0 15px 50px rgba(0, 212, 255, 0.4), 0 0 30px rgba(0, 212, 255, 0.2);
-        }
-        @keyframes popupGlow {
-            0%, 100% { box-shadow: 0 10px 40px rgba(0, 212, 255, 0.2); }
-            50% { box-shadow: 0 10px 50px rgba(0, 212, 255, 0.5), 0 0 30px rgba(0, 212, 255, 0.3); }
-        }
-        .nav-popup-icon {
-            width: 45px;
-            height: 45px;
-            background: linear-gradient(135deg, var(--accent), var(--purple));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
-            animation: iconPulse 1.5s ease-in-out infinite;
-        }
-        @keyframes iconPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-        .nav-popup-content {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        .nav-popup-label {
-            font-family: var(--ff-mono);
-            font-size: 0.6rem;
-            color: var(--accent);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        .nav-popup-title {
-            font-family: var(--ff-display);
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: var(--text);
-        }
-        .nav-popup-arrow {
-            font-size: 1.2rem;
-            color: var(--accent);
-            animation: arrowBounce 1s ease-in-out infinite;
-        }
-        @keyframes arrowBounce {
-            0%, 100% { transform: translateX(0); }
-            50% { transform: translateX(5px); }
-        }
-        .nav-popup-close {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border);
-            color: var(--text2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 0.8rem;
-            transition: all 0.3s ease;
-            margin-left: 10px;
-        }
-        .nav-popup-close:hover {
-            background: rgba(255, 68, 102, 0.2);
-            border-color: var(--red);
-            color: var(--red);
-        }
-        
         @media (max-width: 768px) {
-            .nav-popup { padding: 8px 16px; gap: 12px; }
-            .nav-popup-icon { width: 35px; height: 35px; font-size: 1rem; }
-            .nav-popup-title { font-size: 0.75rem; }
-            .nav-popup-label { font-size: 0.5rem; }
+            .navigation-arrow { bottom: 20px; right: 20px; }
+            .arrow-circle { width: 50px; height: 50px; }
+            .arrow-circle svg { width: 24px; height: 24px; }
+            .arrow-label { font-size: 0.6rem; padding: 5px 12px; }
+            .navigation-arrow:hover .arrow-label { right: 65px; }
+            .verbale-sidebar { width: 280px; min-width: 280px; }
         }
     </style>
 </head>
@@ -477,6 +445,16 @@
     <div class="bg-grid"></div>
     <div class="bg-orb bg-orb-1"></div>
     <div class="bg-orb bg-orb-2"></div>
+
+    <!-- FRECCIA DI NAVIGAZIONE MIGLIORATA - VISIBILE SU TUTTE LE PAGINE -->
+    <div class="navigation-arrow" id="navArrow">
+        <div class="arrow-circle">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
+            </svg>
+        </div>
+        <div class="arrow-label" id="navArrowLabel">Vai a Gestione Progetto →</div>
+    </div>
 
     <!-- Login Overlay -->
     <div class="login-overlay" id="loginOverlay">
@@ -486,19 +464,6 @@
             <input type="password" class="login-input" id="adminPassword" placeholder="Password" autocomplete="off">
             <div><button class="login-submit" id="loginSubmit">Accedi</button></div>
             <div class="login-error" id="loginError">Password errata!</div>
-        </div>
-    </div>
-
-    <!-- NUOVO POPUP DI NAVIGAZIONE INTERATTIVO -->
-    <div class="nav-popup-overlay" id="navPopupOverlay">
-        <div class="nav-popup" id="navPopup">
-            <div class="nav-popup-icon" id="popupIcon">➡️</div>
-            <div class="nav-popup-content">
-                <span class="nav-popup-label" id="popupLabel">PROSSIMA PAGINA</span>
-                <span class="nav-popup-title" id="popupTitle">Gestione Progetto</span>
-            </div>
-            <div class="nav-popup-arrow" id="popupArrow">→</div>
-            <div class="nav-popup-close" id="popupClose">✕</div>
         </div>
     </div>
 
@@ -655,16 +620,15 @@
             <div class="verbale-sidebar">
                 <div class="sidebar-header">
                     <div class="sidebar-title">📝 Verbali <span id="adminBadge"></span></div>
-                    <div class="sidebar-subtitle" id="sidebarCount">10 posti disponibili</div>
+                    <div class="sidebar-subtitle" id="sidebarCount">Posti illimitati</div>
                 </div>
                 <div class="sidebar-admin-area" id="adminArea">
                     <button class="admin-btn" id="adminLoginBtn">🔐 Accesso Admin</button>
                 </div>
                 <div class="sidebar-verbali-list" id="sidebarVerbaliList">
-                    <!-- 10 POSTI PER VERBALI -->
                     <div class="sidebar-empty">📭 Nessun verbale caricato. 10 posti disponibili.</div>
                 </div>
-                <div class="sidebar-footer">💾 Salvati nel browser · Max 10 verbali</div>
+                <div class="sidebar-footer">💾 Salvati nel browser · Posti illimitati</div>
             </div>
             <div class="verbale-main">
                 <div class="ph-mini"><div class="ph-tag">🤖 Sistema AI</div><h1 class="ph-title" style="font-size:1.8rem;">Dettaglio Verbale</h1></div>
@@ -722,7 +686,6 @@
         (function() {
             // ═══════════ ADMIN AUTHENTICATION ═══════════
             const ADMIN_PASSWORD = 'admin123';
-            const MAX_VERBALI = 10; // MASSIMO 10 VERBALI
             let isAdmin = false;
             let currentVerbaleIndex = -1;
             let isEditing = false;
@@ -767,7 +730,6 @@
                 if (existingUploadBtn) {
                     existingUploadBtn.style.display = isAdmin ? 'block' : 'none';
                 }
-                // Aggiorna visibilità pulsante modifica
                 updateEditButtonVisibility();
             }
             
@@ -809,24 +771,15 @@
                 let existingBtn = document.getElementById('sidebarUploadBtn');
                 if (existingBtn) {
                     existingBtn.style.display = isAdmin ? 'block' : 'none';
-                    // Aggiorna testo con contatore posti
-                    const available = MAX_VERBALI - verbaliDB.length;
-                    existingBtn.textContent = available > 0 ? `📤 Carica nuovo verbale (${available} posti)` : '⚠️ Posti esauriti';
-                    existingBtn.disabled = available <= 0;
+                    existingBtn.textContent = `📤 Carica nuovo verbale (${verbaliDB.length} esistenti)`;
                     return;
                 }
-                const available = MAX_VERBALI - verbaliDB.length;
                 const uploadBtn = document.createElement('button');
                 uploadBtn.id = 'sidebarUploadBtn';
                 uploadBtn.className = 'sidebar-upload-btn';
-                uploadBtn.innerHTML = available > 0 ? `📤 Carica nuovo verbale (${available} posti)` : '⚠️ Posti esauriti';
+                uploadBtn.innerHTML = `📤 Carica nuovo verbale (${verbaliDB.length} esistenti)`;
                 uploadBtn.style.display = isAdmin ? 'block' : 'none';
-                uploadBtn.disabled = available <= 0;
                 uploadBtn.onclick = () => {
-                    if (verbaliDB.length >= MAX_VERBALI) {
-                        alert('⚠️ Hai raggiunto il massimo di 10 verbali. Elimina un verbale esistente per caricarne uno nuovo.');
-                        return;
-                    }
                     document.getElementById('sidebarUploadInput').click();
                 };
                 sidebarHeader.appendChild(uploadBtn);
@@ -843,11 +796,6 @@
             
             function handleFileUpload(event) {
                 if (!isAdmin) return;
-                if (verbaliDB.length >= MAX_VERBALI) {
-                    alert('⚠️ Posti esauriti! Massimo 10 verbali.');
-                    event.target.value = '';
-                    return;
-                }
                 const file = event.target.files[0];
                 if (!file) return;
                 const reader = new FileReader();
@@ -871,7 +819,6 @@
                 event.target.value = '';
             }
             
-            // ═══════════ FUNZIONE TOGGLE EDIT MODE ═══════════
             function toggleEditMode() {
                 if (!isAdmin) {
                     alert('🔐 Devi effettuare l\'accesso come Admin per modificare i verbali.');
@@ -890,7 +837,6 @@
                     if (isEditing) {
                         renderVerbaleEditable(currentVerbaleIndex);
                     } else {
-                        // SALVA LE MODIFICHE
                         saveEditableVerbale(currentVerbaleIndex);
                         renderVerbaleView(currentVerbaleIndex);
                     }
@@ -926,7 +872,6 @@
                 d.prossimiPassi.forEach(p => { passiText += `${p.testo}${p.who?` (assegnato a: ${p.who})`:''}${p.date?` (entro: ${p.date})`:''}\n`; });
                 document.getElementById('field-passi').innerHTML = `<textarea class="vf-textarea" id="edit-passi">${passiText}</textarea>`;
                 
-                // Aggiungi classe editing ai blocchi
                 document.querySelectorAll('.verbale-block').forEach(b => b.classList.add('editable'));
             }
             
@@ -979,57 +924,69 @@
                 document.querySelectorAll('.verbale-block').forEach(b => b.classList.remove('editable'));
             }
             
-            // ═══════════ ROUTING con POPUP ═══════════
+            // ═══════════ ROUTING con FRECCIA MIGLIORATA ═══════════
             const pageOrder = ['home', 'fase0', 'fase1', 'specifiche', 'bom', 'triz', 'rischi', 'verbale'];
             const pageNames = {
                 'home': 'Home', 'fase0': 'Gestione Progetto', 'fase1': 'Pianificazione',
                 'specifiche': 'Specifiche Tecniche', 'bom': 'Bill of Materials',
                 'triz': 'Analisi TRIZ', 'rischi': 'Rischi & Mitigazioni', 'verbale': 'Verbali'
             };
-
-            const navPopupOverlay = document.getElementById('navPopupOverlay');
-            const popupLabel = document.getElementById('popupLabel');
-            const popupTitle = document.getElementById('popupTitle');
-            const popupIcon = document.getElementById('popupIcon');
-            const popupArrow = document.getElementById('popupArrow');
-            const popupClose = document.getElementById('popupClose');
-            const navPopup = document.getElementById('navPopup');
             
-            let popupTimeout;
-            function showPopup() {
-                if (navPopupOverlay) { navPopupOverlay.classList.add('active'); if (popupTimeout) clearTimeout(popupTimeout);
-                    popupTimeout = setTimeout(() => { if (navPopupOverlay) navPopupOverlay.classList.remove('active'); }, 5000); }
+            function getCurrentPageId() {
+                const active = document.querySelector('.page.active');
+                return active ? active.dataset.page : 'home';
             }
-            function hidePopup() { if (navPopupOverlay) { navPopupOverlay.classList.remove('active'); if (popupTimeout) clearTimeout(popupTimeout); } }
-            function updatePopup(currentPageId) {
-                const activePage = document.querySelector(`[data-page="${currentPageId}"]`);
-                if (!activePage || !navPopupOverlay) return;
-                const nextPage = activePage.dataset.next; const nextPageName = activePage.dataset.nextname;
-                const prevPage = activePage.dataset.prev; const prevPageName = activePage.dataset.prevname;
-                if (nextPage && nextPageName) { popupLabel.textContent = 'PROSSIMA PAGINA'; popupTitle.textContent = nextPageName; popupIcon.innerHTML = '➡️'; popupArrow.style.display = 'block'; navPopup.onclick = () => { if (nextPage) goto(nextPage); hidePopup(); }; }
-                else if (prevPage && prevPageName) { popupLabel.textContent = 'TORNA INDIETRO'; popupTitle.textContent = prevPageName; popupIcon.innerHTML = '⬅️'; popupArrow.style.display = 'block'; navPopup.onclick = () => { if (prevPage) goto(prevPage); hidePopup(); }; }
-                else { navPopupOverlay.classList.remove('active'); return; }
-                showPopup();
+            
+            function updateArrow() {
+                const currentId = getCurrentPageId();
+                const activePage = document.querySelector(`[data-page="${currentId}"]`);
+                if (!activePage) return;
+                const nextPage = activePage.dataset.next;
+                const nextPageName = activePage.dataset.nextname;
+                const arrow = document.getElementById('navArrow');
+                const label = document.getElementById('navArrowLabel');
+                if (nextPage && nextPageName) {
+                    arrow.style.display = 'flex';
+                    label.textContent = `Vai a ${nextPageName} →`;
+                    arrow.onclick = () => { goto(nextPage); addPulseEffect(); };
+                } else {
+                    arrow.style.display = 'none';
+                }
             }
-            if (popupClose) { popupClose.addEventListener('click', (e) => { e.stopPropagation(); hidePopup(); }); }
-            if (navPopupOverlay) { navPopupOverlay.addEventListener('click', (e) => { if (e.target === navPopupOverlay) hidePopup(); }); }
-
+            
+            function addPulseEffect() {
+                const arrow = document.getElementById('navArrow');
+                arrow.classList.add('pulse');
+                setTimeout(() => arrow.classList.remove('pulse'), 500);
+            }
+            
             function goto(id) {
                 document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
                 const target = document.getElementById('page-' + id);
-                if (target) { target.classList.add('active'); window.scrollTo({ top: 0, behavior: 'smooth' }); updatePopup(id); }
+                if (target) { 
+                    target.classList.add('active'); 
+                    window.scrollTo({ top: 0, behavior: 'smooth' }); 
+                }
                 history.replaceState(null, '', '#' + id);
+                updateArrow();
+                if (id === 'verbale') renderSidebar();
             }
             window.goto = goto;
-
+            
             window.addEventListener('load', () => { 
                 const hash = location.hash.slice(1); 
                 if (hash) goto(hash);
-                else updatePopup('home');
+                else updateArrow();
                 checkAdminSession();
                 if (isAdmin) createUploadButtonInSidebar();
             });
-
+            
+            window.addEventListener('hashchange', () => { 
+                const hash = location.hash.slice(1); 
+                if (hash) goto(hash);
+                updateArrow();
+            });
+            
             // ═══════════ KNOWLEDGE BASE ═══════════
             const knowledgeBase = {
                 progetto: { keywords: ["cos'è","cosa è","progetto","cleaningboat","embt03","descrizione","obiettivo","scopo","di cosa","in cosa consiste"], response: "🚀 **CleaningBoat EMBT03** è un progetto ITS 2025 che sviluppa un sistema di **computer vision embedded** per identificare rifiuti plastici galleggianti in tempo reale.\n\n• Usa **Intelligenza Artificiale su microcontrollore** (TinyML)\n• Riconosce **6 categorie** di rifiuti plastici\n• Comunica via **UART** con un sistema di raccolta (Progetto 4)\n• Budget: **~60 ore** totali\n• Team: **6 membri**\n• Tecnologia: **Edge Impulse + Arduino Uno Q**" },
@@ -1040,7 +997,7 @@
                 ayad: { keywords: ["ayad","chakib","documentazione","doc"], response: "👤 **Ayad Chakib** è nel team **Documentazione**. Si occupa di:\n• Stesura verbali\n• Labeling dataset\n• Ricerca immagini" },
                 gianoglio: { keywords: ["gianoglio","giovanni"], response: "👤 **Gianoglio Giovanni** è nel team **Software**. Si occupa di:\n• Installazione librerie\n• Gestione Arduino Uno Q\n• Training ML\n• Correzione stampa 3D\n• Addestramento IA" },
                 fionda: { keywords: ["fionda","gianluca"], response: "👤 **Fionda Gianluca** è nel team **Documentazione/Software**. Si occupa di:\n• Addestramento IA\n• Labeling dataset\n• Ricerca immagini\n• Training ML" },
-                tecnologia: { keywords: ["tecnologia","tecnologie","stack","edge impulse","tinyml","arduino","mobilenet","modello","ml","ai","intelligenza artificiale","come funziona"], response: "🔧 **Stack Tecnologico:**\n\n• **Hardware:** Arduino Uno Q + Camera ELP USB 8MP\n• **ML Framework:** Edge Impulse (training cloud)\n• **Modello:** MobileNetV1 96×96 pixel in scala di grigi\n• **Ottimizzazione:** Quantizzazione INT8 per ridurre RAM/Flash\n• **Comunicazione:** UART 9600 baud con Progetto 4\n• **Alimentazione:** Powerbank 5V standalone\n• **Meccanica:** Supporto camera stampato in 3D (PLA + vernice impermeabilizzante)\n• **CAD:** NX Siemens per il disegno del supporto" },
+                tecnologia: { keywords: ["tecnologia","tecnologie","stack","edge impulse","tinyml","arduino","mobilenet","modello","ml","ai","intelligenza artificiale","come funziona"], response: "🔧 **Stack Tecnologico:**\n\n• **Hardware:** Arduino Uno Q + Camera ELP USB 8MP\n• **ML Framework:** Edge Impulse (training cloud)\n• **Modello:** MobileNetV1 640x640 pixel in rgb\n• **Ottimizzazione:** Quantizzazione INT8 per ridurre RAM/Flash\n• **Comunicazione:** UART 9600 baud con Progetto 4\n• **Alimentazione:** Powerbank 5V standalone\n• **Meccanica:** Supporto camera stampato in 3D (PLA + vernice impermeabilizzante)\n• **CAD:** NX Siemens per il disegno del supporto" },
                 budget: { keywords: ["budget","ore","costo","tempo","tempistiche","scadenze","milestone","quando","calendario","pianificazione"], response: "💰 **Budget e Tempistiche:**\n\n• Budget totale: **~60 ore**\n• Maggio 2025: ~40 ore\n• Giugno 2025: ~20 ore\n\n📅 **Milestone:**\n• **14 maggio** — Presentazione piano progetto\n• **21 maggio** — Specifiche tecniche + BOM\n• **26-30 maggio** — Setup hardware + dataset\n• **2-6 giugno** — Training modello ML\n• **9-12 giugno** — Collaudo finale" },
                 uart: { keywords: ["uart","comunicazione","progetto 4","seriale","protocollo","baud","collegamento","trasmissione"], response: "🔌 **Protocollo UART con Progetto 4:**\n\n• **Baud rate:** 9600\n• **Formato:** `CLASSE:angolo:distanza`\n• **Collegamento:** TX (P3) → RX (P4), GND comune\n• **Frequenza:** 1 messaggio ogni ~200ms\n• **Dati trasmessi:** tipo di rifiuto, posizione angolare, distanza stimata\n\n⚠️ **Nota importante:** Il GND comune tra i due Arduino è fondamentale! Senza, i segnali non vengono interpretati correttamente." },
                 classi: { keywords: ["classi","categorie","rifiuti","riconosce","oggetti","bottiglia","lattina","busta","bicchiere","tappo","cartaccia"], response: "🏷️ **6 Classi di Rifiuti Riconosciute:**\n\n1. 🍶 **Bottiglia** — plastica, forma cilindrica\n2. 🥫 **Lattina** — alluminio, superficie riflettente\n3. 🛍️ **Busta** — plastica flessibile, forma irregolare\n4. 🥃 **Bicchiere** — plastica, forma troncoconica\n5. 🫙 **Tappo** — piccolo, la classe più difficile\n6. 🍬 **Cartaccia** — involucri, colori variabili" },
@@ -1051,7 +1008,7 @@
                 performance: { keywords: ["accuratezza","precisione","latenza","velocità","performance","prestazioni","metriche","risultati"], response: "📊 **Metriche di Performance:**\n\n• **Accuratezza target:** ≥80% (raggiunto 84% con data augmentation)\n• **Latenza target:** ≤2 secondi per frame (misurato 1.8s)\n• **RAM utilizzata:** ~200KB con quantizzazione INT8\n• **Classi:** 6 categorie di rifiuti\n• **Dataset:** 500+ immagini in condizioni variabili" },
                 presentazione: { keywords: ["presentazione","slide","pitch","deck","powerpoint"], response: "📽️ **Presentazione (15 minuti, 10 slide):**\n\n1. Copertina & Team\n2. Il Problema (inquinamento plastica)\n3. Obiettivi del Progetto\n4. Tecnologia & Stack\n5. Pianificazione (Gantt + Milestone)\n6. Metodologia TRIZ\n7. Rischi & Mitigazioni\n8. Classi di Rifiuti\n9. Risultati Attesi\n10. Q&A\n\nClicca su **📽️ Presentazione** nella navbar per avviare la presentazione interattiva!" }
             };
-
+            
             // ═══════════ CHAT SYSTEM ═══════════
             const chatToggle = document.getElementById('chatToggle');
             const chatPanel = document.getElementById('chatPanel');
@@ -1061,7 +1018,7 @@
             const chatSend = document.getElementById('chatSend');
             const chatTyping = document.getElementById('chatTyping');
             const chatSuggestions = document.getElementById('chatSuggestions');
-
+            
             function findBestMatch(query) {
                 const q = query.toLowerCase().trim(); let bestMatch = null; let bestScore = 0;
                 for (const [topicName, topicData] of Object.entries(knowledgeBase)) {
@@ -1074,13 +1031,13 @@
                 if (bestScore > 0) return bestMatch.response;
                 return null;
             }
-
+            
             function addMessage(text, isUser = false) {
                 const msg = document.createElement('div'); msg.className = `chat-message ${isUser ? 'user' : 'bot'}`;
                 msg.innerHTML = `<div class="chat-avatar">${isUser ? '👤' : '🤖'}</div><div class="chat-bubble">${text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>')}</div>`;
                 chatMessages.appendChild(msg); chatMessages.scrollTop = chatMessages.scrollHeight;
             }
-
+            
             function processQuery(text) {
                 if (!text.trim()) return; addMessage(text, true); chatInput.value = ''; chatTyping.classList.add('active');
                 setTimeout(() => { chatTyping.classList.remove('active');
@@ -1089,7 +1046,7 @@
                     else { addMessage('🤔 Non ho trovato una risposta specifica.\n\nProva a chiedermi:\n• Cos\'è CleaningBoat?\n• Chi è [nome membro]?\n• Budget e tempistiche\n• Quali tecnologie usate?\n• Come funziona UART?\n• Quali rischi ci sono?\n• Cos\'è TRIZ?\n• Quali classi di rifiuti?\n• BOM e componenti', false); }
                 }, 500 + Math.random() * 300);
             }
-
+            
             function openChat() { chatPanel.classList.add('open'); chatToggle.classList.add('active'); chatToggle.textContent = '✕'; }
             function closeChat() { chatPanel.classList.remove('open'); chatToggle.classList.remove('active'); chatToggle.textContent = '💬'; }
             chatToggle.addEventListener('click', () => { chatPanel.classList.contains('open') ? closeChat() : openChat(); });
@@ -1098,7 +1055,7 @@
             chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') processQuery(chatInput.value); });
             chatSuggestions.addEventListener('click', (e) => { if (e.target.classList.contains('chat-suggestion')) processQuery(e.target.textContent); });
             window.openChat = openChat;
-
+            
             // ═══════════ PRESENTATION ═══════════
             const slidesData = [
                 { number:'01', title:'CleaningBoat EMBT03', subtitle:'Sistema AI per il riconoscimento di rifiuti plastici in acqua', type:'cover', icon:'⛵', content:['Progetto ITS 2025','Intelligenza Artificiale su Microcontrollore','Computer Vision con Edge Impulse'] },
@@ -1122,7 +1079,7 @@
             const presPrev = document.getElementById('presPrev');
             const presNext = document.getElementById('presNext');
             const presClose = document.getElementById('presClose');
-
+            
             function buildAllSlides() {
                 slideArea.innerHTML = '';
                 slidesData.forEach((slide, index) => {
@@ -1148,9 +1105,9 @@
             overlay.addEventListener('click', (e) => { if (e.target === overlay) closePresentation(); });
             document.addEventListener('keydown', (e) => { if (!overlay.classList.contains('open')) return; if (e.key === 'Escape') closePresentation(); if (e.key === 'ArrowRight') goToSlide(currentSlide + 1); if (e.key === 'ArrowLeft') goToSlide(currentSlide - 1); });
             window.openPresentation = openPresentation;
-
-            // ═══════════ VERBALI ═══════════
-            const STORAGE_KEY = 'cleaningboat_verbali';
+            
+            // ═══════════ VERBALI CON POSTI ILLIMITATI ═══════════
+            const STORAGE_KEY = 'cleaningboat_verbali_unlimited';
             let verbaliDB = [];
             function loadVerbali() { 
                 try { 
@@ -1169,59 +1126,48 @@
                 if (!sidebarVerbaliList) return;
                 sidebarVerbaliList.innerHTML = '';
                 
-                // Mostra 10 posti (slot)
-                for (let i = 0; i < MAX_VERBALI; i++) {
-                    const v = verbaliDB[i] || null;
-                    const slot = document.createElement('div');
-                    if (v) {
+                if (verbaliDB.length === 0) {
+                    sidebarVerbaliList.innerHTML = '<div class="sidebar-empty">📭 Nessun verbale caricato. Usa il tasto "Carica nuovo verbale" per aggiungerne uno.</div>';
+                } else {
+                    verbaliDB.forEach((v, idx) => {
+                        const slot = document.createElement('div');
                         slot.className = 'sidebar-verbale-item';
-                        if (currentVerbaleIndex === i) slot.classList.add('active');
+                        if (currentVerbaleIndex === idx) slot.classList.add('active');
                         if (isAdmin) slot.classList.add('editable');
                         slot.innerHTML = `
                             <div class="sidebar-verbale-info">
-                                <div class="sidebar-verbale-date">📅 Posto #${i+1} · ${v.date||'Data sconosciuta'}</div>
+                                <div class="sidebar-verbale-date">📅 ${v.date||'Data sconosciuta'}</div>
                                 <div class="sidebar-verbale-title">${v.title||'Senza titolo'}</div>
                                 <div class="sidebar-verbale-meta">${v.tipo||''}</div>
                             </div>
                             ${isAdmin ? '<button class="sidebar-verbale-delete" title="Elimina">🗑️</button>' : ''}
                         `;
-                        slot.querySelector('.sidebar-verbale-info').addEventListener('click', () => selectVerbale(i));
+                        slot.querySelector('.sidebar-verbale-info').addEventListener('click', () => selectVerbale(idx));
                         const deleteBtn = slot.querySelector('.sidebar-verbale-delete');
                         if (deleteBtn) {
                             deleteBtn.addEventListener('click', (e) => { 
                                 e.stopPropagation(); 
-                                if(confirm(`Eliminare il verbale "${v.title}" dal posto #${i+1}?`)){
-                                    verbaliDB.splice(i,1);
+                                if(confirm(`Eliminare il verbale "${v.title}"?`)){
+                                    verbaliDB.splice(idx,1);
                                     saveVerbali();
-                                    if (currentVerbaleIndex === i) {
+                                    if (currentVerbaleIndex === idx) {
                                         currentVerbaleIndex = -1;
                                         document.getElementById('emptyState').style.display='block';
                                         document.getElementById('verbaleContent').style.display='none';
+                                    } else if (currentVerbaleIndex > idx) {
+                                        currentVerbaleIndex--;
                                     }
                                     renderSidebar();
                                     createUploadButtonInSidebar();
                                 }
                             });
                         }
-                    } else {
-                        slot.className = 'sidebar-verbale-item';
-                        slot.style.opacity = '0.5';
-                        slot.style.borderStyle = 'dashed';
-                        slot.innerHTML = `
-                            <div class="sidebar-verbale-info">
-                                <div class="sidebar-verbale-date">📭 Posto #${i+1}</div>
-                                <div class="sidebar-verbale-title" style="color:var(--text2);">Vuoto</div>
-                                <div class="sidebar-verbale-meta">Disponibile per upload</div>
-                            </div>
-                        `;
-                    }
-                    sidebarVerbaliList.appendChild(slot);
+                        sidebarVerbaliList.appendChild(slot);
+                    });
                 }
                 
                 const count = verbaliDB.length;
-                if(sidebarCount) sidebarCount.textContent = `${count}/10 verbale${count!==1?'i':''} · ${MAX_VERBALI-count} posti liberi`;
-                
-                // Aggiorna bottone modifica
+                if(sidebarCount) sidebarCount.textContent = `${count} verbale${count!==1?'i':''} · Posti illimitati`;
                 updateEditButtonVisibility();
             }
             
@@ -1233,7 +1179,7 @@
                 
                 document.getElementById('emptyState').style.display = 'none';
                 document.getElementById('verbaleContent').style.display = 'block';
-                document.getElementById('verbaleFileInfo').innerHTML = `<span>📂</span><span><strong>Posto #${index+1}: ${v.title}</strong> · ${v.date}</span>`;
+                document.getElementById('verbaleFileInfo').innerHTML = `<span>📂</span><span><strong>${v.title}</strong> · ${v.date}</span>`;
                 
                 if (isEditing) {
                     renderVerbaleEditable(index);
@@ -1241,7 +1187,6 @@
                     renderVerbaleView(index);
                 }
                 
-                // Aggiungi bottone modifica se non esiste
                 let editBtn = document.getElementById('editToggleBtn');
                 if (!editBtn) {
                     const verbaleMain = document.querySelector('.verbale-main .ph-mini');
@@ -1256,7 +1201,6 @@
                     }
                 }
                 updateEditButtonVisibility();
-                
                 renderSidebar();
             }
             
@@ -1275,11 +1219,7 @@
                 const pss=c.match(/Prossimi[:\s]*(?:Passi[:\s]*)?([\s\S]*?)$/i);if(pss)d.prossimiPassi=pss[1].split('\n').map(l=>l.replace(/^[\s\-\•\*\d\.\#]+/,'').trim()).filter(l=>l.length>3).map(p=>{const w=p.match(/(?:assegnato a|responsabile)[:\s]*([A-Za-zÀ-ÿ\s]+)/i);const dd=p.match(/(?:entro|scadenza)[:\s]*(\d{1,2}[\/\-.]?\d{1,2}[\/\-.]?\d{2,4})/i);return{testo:p,who:w?w[1].trim():'',date:dd?dd[1].trim():''};});
                 return d;
             }
-
-            renderSidebar();
-            if (verbaliDB.length > 0) selectVerbale(0);
-            createUploadButtonInSidebar();
-
+            
             // ═══════════ DATA POPULATION ═══════════
             const team=[{abbr:'PM',name:'Luchini Alessandro',role:'Referente: IA, BOM, Schema Elettrico, Labeling',c:'#00d4ff'},{abbr:'HW/SW',name:'Genzini Lorenzo',role:'HW Lead: CAD, Sito, IA, BOM, Labeling',c:'#00ff88'},{abbr:'SW',name:'Bogdan Matteo',role:'Software: Librerie, Arduino, Training ML',c:'#00ff88'},{abbr:'DOC',name:'Ayad Chakib',role:'Documentazione: Verbali, Labeling',c:'#ffaa00'},{abbr:'SW',name:'Gianoglio Giovanni',role:'Software: Arduino, ML, Stampa 3D, IA',c:'#00ff88'},{abbr:'DOC/SW',name:'Fionda Gianluca',role:'Doc/Software: IA, Labeling, Training',c:'#ffaa00'}];
             const tg=document.getElementById('f0-team');if(tg)team.forEach(t=>{const e=document.createElement('div');e.className='team-card';e.innerHTML=`<span class="team-abbr" style="color:${t.c};background:${t.c}15;border:1px solid ${t.c}40">${t.abbr}</span><div class="team-name">${t.name}</div><div class="team-role">${t.role}</div>`;tg.appendChild(e);});
@@ -1289,7 +1229,7 @@
             const dg=document.getElementById('f0-docs');if(dg)docs.forEach(d=>{const e=document.createElement('div');e.className='card card-orange';e.innerHTML=`<div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;"><div>${d.icon}</div><div><div style="font-family:var(--ff-display);font-weight:700;">${d.title}</div><div style="font-size:.72rem;color:var(--text2)">${d.sub}</div></div></div><div style="font-size:.82rem;color:var(--text2);">${d.body}</div>`;dg.appendChild(e);});
             [{v:'~60h',l:'Ore Totali'},{v:'~40h',l:'Maggio'},{v:'~20h',l:'Giugno'},{v:'5',l:'Milestone'},{v:"15'",l:'Presentazione'}].forEach(s=>{const e=document.createElement('div');e.className='stat-box';e.innerHTML=`<div class="stat-v">${s.v}</div><div class="stat-l">${s.l}</div>`;document.getElementById('f1-stats')?.appendChild(e);});
             const gr=[{label:'Pianificazione',wks:[1,0,0,0,0],color:'#00ff88'},{label:'Specifiche + BOM',wks:[0,1,0,0,0],color:'#00ff88'},{label:'Setup Hardware',wks:[0,0,1,0,0],color:'#00d4ff'},{label:'Raccolta dataset',wks:[0,0,1,1,0],color:'#00d4ff'},{label:'Training ML',wks:[0,0,0,1,0],color:'#ffaa00'},{label:'Integrazione',wks:[0,0,0,1,0],color:'#ffaa00'},{label:'Collaudo',wks:[0,0,0,0,1],color:'#ff4466'},{label:'Documentazione',wks:[0,0,0,0,1],color:'#ff4466'}];
-            const gb=document.getElementById('f1-gantt');if(gb)gr.forEach(r=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${r.label}</td>`+r.wks.map(a=>`<td style="text-align:center">${a?`<span class="gantt-bar" style="width:80%;background:${r.color};"></span>`:''}</td>`).join('');gb.appendChild(tr);});
+            const gb=document.getElementById('f1-gantt');if(gb)gr.forEach(r=>{const tr=document.createElement('tr');tr.innerHTML=`<tr>${r.label}</td>`+r.wks.map(a=>`<td style="text-align:center">${a?`<span class="gantt-bar" style="width:80%;background:${r.color};"></span>`:''}</td>`).join('');gb.appendChild(tr);});
             const ms=[{date:'14 maggio',title:'Presentazione piano',badge:'URGENTE',bc:'#ff4466'},{date:'21 maggio',title:'Specifiche + BOM',badge:'PROSSIMA',bc:'#ffaa00'},{date:'26-30 mag',title:'Setup HW',badge:'DEV',bc:'#00ff88'},{date:'2-6 giugno',title:'Training',badge:'ML',bc:'#00d4ff'},{date:'9-12 giugno',title:'Collaudo finale',badge:'FINALE',bc:'#00ff88'}];
             const ml=document.getElementById('f1-ms');if(ml)ms.forEach(m=>{const e=document.createElement('div');e.className='ms-item';e.innerHTML=`<div class="ms-date">${m.date}</div><div><div class="ms-title">${m.title}</div></div><span class="ms-badge" style="color:${m.bc};border-color:${m.bc};">${m.badge}</span>`;ml.appendChild(e);});
             const slidesP=[{t:"0-2'",title:'Team',desc:'Nomi, ruoli'},{t:"2-4'",title:'Problema',desc:'AI e rifiuti'},{t:"4-7'",title:'Obiettivi',desc:'Firmware, ML, 3D'},{t:"7-10'",title:'Gantt',desc:'Timeline'},{t:"10-12'",title:'Metodologia',desc:'TRIZ'},{t:"12-14'",title:'Rischi',desc:'Mitigazioni'},{t:"14-15'",title:'Q&A',desc:'Domande'}];
