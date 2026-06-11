@@ -379,6 +379,8 @@
         .sidebar-verbale-meta { font-size:0.58rem; color:var(--text2); }
         .sidebar-verbale-delete { background:none; border:none; color:var(--text2); cursor:pointer; font-size:0.7rem; padding:0.15rem 0.35rem; border-radius:3px; transition:all var(--transition); }
         .sidebar-verbale-delete:hover { color:var(--red); background:rgba(255,68,102,0.1); }
+        .sidebar-verbale-edit { background:none; border:none; color:var(--accent); cursor:pointer; font-size:0.7rem; padding:0.15rem 0.35rem; border-radius:3px; transition:all var(--transition); margin-right:0.25rem; }
+        .sidebar-verbale-edit:hover { color:var(--purple); background:rgba(180,77,255,0.1); }
         .sidebar-empty { text-align:center; padding:2rem 1rem; color:var(--text2); font-style:italic; font-size:0.75rem; }
         .sidebar-footer { padding:0.6rem 0.85rem; border-top:1px solid var(--border); font-size:0.58rem; color:var(--text2); text-align:center; }
         
@@ -460,7 +462,7 @@
     <div class="login-overlay" id="loginOverlay">
         <div class="login-box">
             <h3>🔐 Accesso Admin</h3>
-            <p style="font-size:0.7rem;color:var(--text2);">Inserisci la password per caricare verbali</p>
+            <p style="font-size:0.7rem;color:var(--text2);">Inserisci la password per caricare e modificare verbali</p>
             <input type="password" class="login-input" id="adminPassword" placeholder="Password" autocomplete="off">
             <div><button class="login-submit" id="loginSubmit">Accedi</button></div>
             <div class="login-error" id="loginError">Password errata!</div>
@@ -731,14 +733,23 @@
                     existingUploadBtn.style.display = isAdmin ? 'block' : 'none';
                 }
                 updateEditButtonVisibility();
+                renderSidebar(); // Rerender per mostrare/nascondere i pulsanti edit
             }
             
             function showLoginModal() {
                 if (isAdmin) {
+                    // Logout
                     isAdmin = false;
                     sessionStorage.removeItem('cleaningboat_admin');
+                    if (isEditing) {
+                        // Salva prima di uscire
+                        saveEditableVerbale(currentVerbaleIndex);
+                        isEditing = false;
+                    }
                     updateAdminUI();
-                    if (isEditing) toggleEditMode();
+                    if (currentVerbaleIndex >= 0) {
+                        renderVerbaleView(currentVerbaleIndex);
+                    }
                     return;
                 }
                 loginOverlay.classList.add('active');
@@ -819,6 +830,21 @@
                 event.target.value = '';
             }
             
+            // NUOVA FUNZIONE: Attiva modifica per un verbale specifico dalla sidebar
+            function startEditVerbale(index) {
+                if (!isAdmin) {
+                    alert('🔐 Devi effettuare l\'accesso come Admin per modificare i verbali.');
+                    showLoginModal();
+                    return;
+                }
+                // Seleziona il verbale
+                selectVerbale(index);
+                // Attiva la modalità modifica se non già attiva
+                if (!isEditing) {
+                    toggleEditMode();
+                }
+            }
+            
             function toggleEditMode() {
                 if (!isAdmin) {
                     alert('🔐 Devi effettuare l\'accesso come Admin per modificare i verbali.');
@@ -841,6 +867,7 @@
                         renderVerbaleView(currentVerbaleIndex);
                     }
                 }
+                renderSidebar(); // Aggiorna sidebar per mostrare stato editing
             }
             
             function updateEditButtonVisibility() {
@@ -1134,13 +1161,22 @@
                         slot.className = 'sidebar-verbale-item';
                         if (currentVerbaleIndex === idx) slot.classList.add('active');
                         if (isAdmin) slot.classList.add('editable');
+                        
+                        let actionButtons = '';
+                        if (isAdmin) {
+                            actionButtons = `
+                                <button class="sidebar-verbale-edit" title="Modifica questo verbale" onclick="event.stopPropagation(); window._startEditVerbale(${idx})">✏️</button>
+                                <button class="sidebar-verbale-delete" title="Elimina">🗑️</button>
+                            `;
+                        }
+                        
                         slot.innerHTML = `
                             <div class="sidebar-verbale-info">
                                 <div class="sidebar-verbale-date">📅 ${v.date||'Data sconosciuta'}</div>
                                 <div class="sidebar-verbale-title">${v.title||'Senza titolo'}</div>
-                                <div class="sidebar-verbale-meta">${v.tipo||''}</div>
+                                <div class="sidebar-verbale-meta">${v.tipo||''}${isEditing && currentVerbaleIndex === idx ? ' <span style="color:var(--green);">[in modifica]</span>' : ''}</div>
                             </div>
-                            ${isAdmin ? '<button class="sidebar-verbale-delete" title="Elimina">🗑️</button>' : ''}
+                            ${actionButtons}
                         `;
                         slot.querySelector('.sidebar-verbale-info').addEventListener('click', () => selectVerbale(idx));
                         const deleteBtn = slot.querySelector('.sidebar-verbale-delete');
@@ -1152,6 +1188,7 @@
                                     saveVerbali();
                                     if (currentVerbaleIndex === idx) {
                                         currentVerbaleIndex = -1;
+                                        isEditing = false;
                                         document.getElementById('emptyState').style.display='block';
                                         document.getElementById('verbaleContent').style.display='none';
                                     } else if (currentVerbaleIndex > idx) {
@@ -1162,6 +1199,13 @@
                                 }
                             });
                         }
+                        const editBtn = slot.querySelector('.sidebar-verbale-edit');
+                        if (editBtn) {
+                            editBtn.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                startEditVerbale(idx);
+                            });
+                        }
                         sidebarVerbaliList.appendChild(slot);
                     });
                 }
@@ -1170,6 +1214,9 @@
                 if(sidebarCount) sidebarCount.textContent = `${count} verbale${count!==1?'i':''} · Posti illimitati`;
                 updateEditButtonVisibility();
             }
+            
+            // Esponi la funzione globalmente per i pulsanti nella sidebar
+            window._startEditVerbale = startEditVerbale;
             
             function selectVerbale(index) {
                 if (index >= verbaliDB.length) return;
